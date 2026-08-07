@@ -1139,7 +1139,6 @@ document.querySelectorAll('.sub-tab').forEach(tab=>{
 
 computeAndRender();
 loadPersistedRecords();
-loadSeedFiles();
 
 // ================= AUTO-LOAD SEED FILES (same directory as this page) =================
 const SEED_FILES = [
@@ -1184,6 +1183,7 @@ async function loadSeedFiles(){
     statusEl.textContent = msg;
   }
 }
+loadSeedFiles();
 
 // ================= IMPORT =================
 function parseSheetToRecords(sheet){
