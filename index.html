@@ -11,7 +11,7 @@
   :root{
     --bg:#141A2C; --surface:#1E2843; --surface-alt:#26314F;
     --border:#3B4770; --border-soft:#242E4A;
-    --text:#F6F2EA; --muted:#A0A7C2; --muted-2:#707899;
+    --text:#F6F2EA; --muted:#A0A7C2; --muted-2:#999999;
     --wheat:#D97757; --wheat-dim:#9C5A40; --clay:#B0523A; --forest:#54705F; --sky:#4C7A8C;
     --bright-red:#E5383B;
     --gold:#D8A930; --gold-dim:#8A701F;
@@ -49,6 +49,7 @@
   .import-panel{
     background:var(--surface); border:1px solid var(--border); border-radius:8px;
     padding:10px 12px; min-width:0; flex-shrink:0; box-shadow:var(--shadow-card);
+    margin-top:16px; display:inline-block;
   }
   .import-row{display:flex; align-items:center; gap:8px;}
   .btn{
@@ -127,10 +128,10 @@
   .trend-swatch{width:12px; height:12px; border-radius:3px; flex-shrink:0;}
   .trend-select-group select{
     background:var(--surface-alt); border:1px solid var(--border); color:var(--text);
-    padding:8px 10px; border-radius:6px; font-size:13px; font-family:inherit; max-width:220px;
+    padding:8px 10px; border-radius:6px; font-size:13px; font-family:inherit; max-width:220px; font-weight:600;
   }
   .trend-select-group select:focus{outline:1px solid var(--wheat); border-color:var(--wheat);}
-  .trend-legend{display:flex; flex-wrap:wrap; gap:16px; margin-top:14px; font-size:12.5px; color:var(--muted);}
+  .trend-legend{display:flex; flex-wrap:wrap; gap:16px; margin-top:14px; font-size:12.5px; color:var(--muted); font-weight:600;}
   .trend-legend-item{display:flex; align-items:center; gap:6px;}
   .trend-chart-svg{width:100%; height:auto; display:block;}
   .trend-empty{color:var(--muted-2); font-size:13px; padding:20px 0; text-align:center;}
@@ -142,7 +143,7 @@
   }
   .gauge-rule span{
     position:absolute; left:0; top:-9px; background:var(--bg); padding-right:14px;
-    font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--muted-2); letter-spacing:.08em;
+    font-family:'IBM Plex Mono',monospace; font-size:12px; color:#707899; letter-spacing:.08em; font-weight:700;
   }
 
   .kpi-row{display:grid; grid-template-columns:repeat(4,1fr); gap:14px;}
@@ -158,7 +159,7 @@
   .section-head h2{font-size:22px; color:var(--text);}
   .section-head .num{color:var(--wheat); font-family:'IBM Plex Mono',monospace; font-size:14px; margin-right:10px;}
   .head-stat{font-family:'IBM Plex Mono',monospace; font-size:14px; color:var(--muted); font-weight:400;}
-  .section-desc{color:var(--muted); font-size:14px; margin-top:6px; max-width:640px;}
+  .section-desc{color:var(--muted); font-size:14px; margin-top:6px; max-width:640px; font-weight:600;}
 
   .panel{background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:24px; margin-top:20px; box-shadow:var(--shadow-card);}
   .trend-panel-black{border-color:#000000; background:#000000;}
@@ -168,9 +169,11 @@
   .bar-row{display:grid; grid-template-columns:170px 1fr 190px; align-items:center; gap:14px; padding:9px 0; border-bottom:1px solid var(--border-soft);}
   .bar-row:last-child{border-bottom:none;}
   .bar-row .rlabel{font-size:13px;}
+  #top10Bars .rlabel, #feedBars .rlabel{font-weight:700; font-size:14.3px;}
+  #countyBars .rlabel{font-size:14.3px;}
   .bar-row .rlabel .rank{font-family:'IBM Plex Mono',monospace; color:var(--wheat-dim); font-size:11px; margin-right:6px;}
   .bar-row .rlabel .rank.top3{color:var(--wheat);}
-  .bar-row .rlabel .tag{display:block; font-size:11px; color:var(--muted-2); margin-top:2px; margin-left:20px;}
+  .bar-row .rlabel .tag{display:block; font-size:11px; color:var(--muted-2); margin-top:2px; margin-left:20px; font-weight:600 !important;}
   .bar-track{height:20px; background:var(--surface-alt); border-radius:2px; overflow:hidden; border:1px solid var(--border-soft); position:relative;}
   .bar-fill{height:100%; background:linear-gradient(90deg, var(--gold-dim), var(--gold));}
   .bar-row .rvals{font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--text); text-align:right; white-space:nowrap;}
@@ -195,15 +198,14 @@
     background:linear-gradient(180deg, #E08361, var(--wheat)); border-radius:20px; padding:3px 10px; white-space:nowrap;
   }
   .fc-card .fc-name{font-family:'Fraunces',Georgia,serif; font-size:19px;}
-  .fc-card .fc-total{font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--muted); text-align:right; white-space:nowrap;}
+  .fc-card .fc-total{font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--text); text-align:right; white-space:nowrap;}
   .fc-row{display:grid; grid-template-columns:20px 1fr auto; gap:8px; align-items:center; padding:7px 0; border-bottom:1px solid var(--border-soft);}
   .fc-row:last-child{border-bottom:none;}
-  .fc-row .fc-rank{font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--wheat-dim); white-space:nowrap;}
-  .fc-row .fc-rank.top1{color:var(--gold); font-weight:600; font-size:14px;}
-  .fc-row .fc-cname{font-size:13px;}
-  .fc-row .fc-vals{font-family:'IBM Plex Mono',monospace; font-size:12px; text-align:right; white-space:nowrap;}
+  .fc-row .fc-rank{font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--wheat); white-space:nowrap;}
+  .fc-row .fc-cname{font-size:14.3px; font-weight:700 !important;}
+  .fc-row .fc-vals{font-family:'IBM Plex Mono',monospace; font-size:13.2px; text-align:right; white-space:nowrap;}
   .fc-row .fc-vals .fc-pct{color:var(--wheat); font-weight:600;}
-  .fc-row .fc-vals .fc-amt{display:block; color:var(--muted); font-size:10.5px;}
+  .fc-row .fc-vals .fc-amt{display:block; color:var(--muted); font-size:11.55px;}
 
   table{width:100%; min-width:560px; border-collapse:collapse; font-size:13px; margin-top:6px;}
   th{
@@ -213,6 +215,7 @@
   }
   th:hover{color:var(--wheat);}
   td{padding:8px 10px; border-bottom:1px solid var(--border-soft);}
+  td.company-name-cell{font-weight:700 !important;}
   td.num{font-family:'IBM Plex Mono',monospace; text-align:right;}
   tr:hover td{background:var(--surface-alt);}
   .table-scroll{max-height:420px; overflow:auto; border:1px solid var(--border); border-radius:10px;}
@@ -225,10 +228,10 @@
   .search-row .hint{font-size:12px; color:var(--muted-2);}
   .county-chip{
     display:inline-block; font-size:10.5px; padding:1px 7px; margin:2px 3px 0 0; border-radius:10px;
-    background:var(--surface); border:1px solid var(--border); color:var(--muted);
+    background:var(--surface); border:1px solid var(--border); color:var(--text);
   }
 
-  footer{margin-top:60px; border-top:1px solid var(--border); padding-top:24px; color:var(--muted-2); font-size:12.5px;}
+  footer{margin-top:60px; border-top:1px solid var(--border); padding-top:24px; color:var(--muted-2); font-size:11.25px;}
   .tab-footnote{margin-top:44px; padding-top:18px; border-top:1px solid var(--border-soft); color:var(--muted-2); font-size:12px;}
   .tab-footnote b{color:var(--muted);}
   footer p{margin:6px 0;}
@@ -258,6 +261,12 @@
     td{padding:6px 6px;}
     .county-chip{padding:1px 5px; margin:1px 2px 0 0; font-size:9.5px;}
   }
+
+  /* 單一年度分析：所有細體文字一律加粗 */
+  #tab-single p, #tab-single span, #tab-single div, #tab-single td, #tab-single th,
+  #tab-single label, #tab-single input, #tab-single button, #tab-single select {
+    font-weight: 600;
+  }
 </style>
 </head>
 <body>
@@ -268,20 +277,6 @@
       <div class="eyebrow">農業部・臺灣配合飼料產量調查</div>
       <h1>台灣畜產飼料產量分析儀表板</h1>
       <div class="designer-credit">系統設計：赫睿師管顧公司　維妮</div>
-    </div>
-    <div class="import-panel">
-      <div class="import-row">
-        <div class="import-year-row">
-          <label for="importYear">年度</label>
-          <input type="number" id="importYear" min="100" value="113">
-        </div>
-        <label class="btn" for="fileInput">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2"/></svg>
-          匯入 Excel
-        </label>
-      </div>
-      <input type="file" id="fileInput" accept=".xlsx,.xls" multiple>
-      <div class="import-status" id="importStatus"></div>
     </div>
   </header>
 
@@ -380,8 +375,7 @@
 
   <div class="gauge-rule"><span>04 — 地理分布</span></div>
   <section>
-    <div class="section-head"><h2><span class="num">④</span>各縣市畜產飼料產量</h2></div>
-    <div class="section-desc" id="countyDesc">中彰投雲及南高地區為臺灣畜牧飼料生產重鎮。</div>
+    <div class="section-head"><h2><span class="num">④</span>各縣市畜產飼料產量 <span class="head-stat" id="countyHeadStat"></span></h2></div>
     <div class="panel"><div id="countyBars"></div></div>
   </section>
 
@@ -427,6 +421,20 @@
   <footer>
     <p><b>資料來源：</b>農業部「臺灣配合飼料產量調查報告」畜產配合飼料產量總表（原始載入：表3-1桃園市/苗栗縣/臺中市/彰化縣/雲林縣、表3-2嘉義縣/臺南市/高雄市、表3-3屏東縣/宜蘭縣/臺東縣）。</p>
     <p><b>匯入資料：</b>可匯入其他縣市或年度的同格式 Excel 表（欄位需包含：縣市、公司名稱、豬、肉雞、有色雞、蛋雞、火雞、肉鴨、蛋鴨、鵝、鴕鳥、乳牛、肉牛、乳羊、肉羊、鹿、兔、濃縮飼料、其他、犬貓、小計）。匯入後所有圖表與統計即時重新計算；「小計」列會自動略過；重新匯入同一年度資料會覆蓋該年度舊資料。此功能僅在您的瀏覽器中處理資料，不會上傳到任何伺服器。若匯入按鈕無反應，可能是瀏覽器網路限制，圖表本身仍會正常顯示。</p>
+    <div class="import-panel">
+      <div class="import-row">
+        <div class="import-year-row">
+          <label for="importYear">年度</label>
+          <input type="number" id="importYear" min="100" value="113">
+        </div>
+        <label class="btn" for="fileInput">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2"/></svg>
+          匯入 Excel
+        </label>
+      </div>
+      <input type="file" id="fileInput" accept=".xlsx,.xls" multiple>
+      <div class="import-status" id="importStatus"></div>
+    </div>
   </footer>
 
 </div>
@@ -507,17 +515,20 @@ function rebuildMasterCanonicalMap(){
 }
 
 let selectedYear = null; // ROC year number, or 'all'
+let userPickedYear = false; // becomes true once the user manually clicks a year tab
 
 function renderYearTabs(){
   const years = [...new Set(records.map(r=>r.year))].sort((a,b)=>a-b);
-  if(selectedYear === null || selectedYear === 'all') selectedYear = years[years.length-1]; // default: latest year
+  if(!userPickedYear || selectedYear === 'all' || !years.includes(selectedYear)){
+    selectedYear = years[years.length-1]; // default: always track the latest available year
+  }
   const wrap = document.getElementById('yearTabs');
   wrap.innerHTML = '';
   years.forEach(y=>{
     const tab = document.createElement('div');
     tab.className = 'year-tab' + (selectedYear===y ? ' active' : '') + (y===years[years.length-1] ? ' is-latest' : '');
     tab.textContent = y + '年';
-    tab.addEventListener('click', ()=>{ selectedYear = y; computeAndRender(); });
+    tab.addEventListener('click', ()=>{ selectedYear = y; userPickedYear = true; computeAndRender(); });
     wrap.appendChild(tab);
   });
 }
@@ -763,12 +774,12 @@ function buildLineChartSVG(series, years, opts){
   ticks.forEach(t=>{
     const y = yAt(t.value);
     gridSvg += `<line x1="${padL}" y1="${y}" x2="${width-padR}" y2="${y}" stroke="${COL_BORDER_SOFT}" stroke-width="1"/>`;
-    gridSvg += `<text x="${padL-10}" y="${y+4}" text-anchor="end" font-size="10.5" fill="${COL_MUTED2}" font-family="IBM Plex Mono, monospace">${t.label}</text>`;
+    gridSvg += `<text x="${padL-10}" y="${y+4}" text-anchor="end" font-size="10.5" fill="${COL_MUTED2}" font-family="IBM Plex Mono, monospace" font-weight="700">${t.label}</text>`;
   });
 
   let xLabelsSvg = '';
   years.forEach((y,i)=>{
-    xLabelsSvg += `<text x="${xAt(i)}" y="${height-14}" text-anchor="middle" font-size="11.5" fill="${COL_MUTED}" font-family="IBM Plex Mono, monospace">${y}年</text>`;
+    xLabelsSvg += `<text x="${xAt(i)}" y="${height-14}" text-anchor="middle" font-size="11.5" fill="${COL_MUTED}" font-family="IBM Plex Mono, monospace" font-weight="700">${y}年</text>`;
   });
 
   let rankRowSvg = '';
@@ -839,7 +850,7 @@ function buildLineChartSVG(series, years, opts){
 
   let unitSvg = '';
   if(opts.unitLabel){
-    unitSvg = `<text x="${width-padR}" y="${padT-22}" text-anchor="end" font-size="11.5" fill="${COL_MUTED}" font-family="IBM Plex Sans TC, sans-serif">${opts.unitLabel}</text>`;
+    unitSvg = `<text x="${width-padR}" y="${padT-22}" text-anchor="end" font-size="11.5" fill="${COL_MUTED}" font-family="IBM Plex Sans TC, sans-serif" font-weight="700">${opts.unitLabel}</text>`;
   }
 
   return `<svg class="trend-chart-svg" viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">
@@ -876,7 +887,7 @@ function renderTrendTotalChart(yearly){
   });
   const yTicks = [4500000,5500000,6500000].map(v=>({value:v, label:(v/10000)+'萬'}));
   wrap.innerHTML = buildLineChartSVG([{name:'總產量', color:'#D8A930', points}], years, {
-    height:320, yTicks, unitLabel:'單位：公噸', blackBg:true, labelFontSize: 7.7,
+    height:320, yTicks, unitLabel:'單位：公噸', blackBg:true, labelFontSize: 8.47,
     rankRow: { value: 4500000, offsetY: 10, items: rankItems, fontSize: 12 }
   });
   descEl.textContent = '折線標示每年全臺總產量，最多可累積並保留近 10 年資料（ 名次代表國興畜產 ）';
@@ -1027,7 +1038,7 @@ function renderCounties(counties){
   const top5 = counties.slice(0,5);
   const sumTotal = top5.reduce((a,d)=>a+d.total,0);
   const sumShare = top5.reduce((a,d)=>a+d.share,0);
-  document.getElementById('countyDesc').textContent = `(前五大縣市總合 ${fmt(sumTotal)}公噸, ${sumShare.toFixed(1)}%)`;
+  document.getElementById('countyHeadStat').textContent = `(前五大縣市總合 ${fmt(sumTotal)}公噸, ${sumShare.toFixed(1)}%)`;
   const wrap = document.getElementById('countyBars');
   wrap.innerHTML = '';
   const maxVal = counties[0].total;
@@ -1085,7 +1096,7 @@ function applyTableView(){
     const tr = document.createElement('tr');
     tr.className = 'company-row';
     tr.innerHTML = `<td class="num">${d.rank}</td>
-      <td>${highlightName(d.name)}</td>
+      <td class="company-name-cell">${highlightName(d.name)}</td>
       <td>${d.counties.map(c=>`<span class="county-chip">${c}</span>`).join('')}</td>
       <td class="num">${fmt(d.total)}</td>
       <td class="num growth-cell">${growthHTML(d.growth)}</td>
@@ -1152,24 +1163,34 @@ const SEED_FILES = [
 ];
 
 async function loadSeedFiles(){
-  if(typeof XLSX === 'undefined') return;
+  if(typeof XLSX === 'undefined'){ console.warn('[畜產儀表板] XLSX 套件未載入，無法自動匯入'); return; }
   const statusEl = document.getElementById('importStatus');
   const loadedYears = [], failedFiles = [];
   for(const {year, file} of SEED_FILES){
     try{
       const res = await fetch(file, {cache:'no-store'});
-      if(!res.ok){ failedFiles.push(file); continue; }
+      if(!res.ok){
+        console.warn(`[畜產儀表板] ${file} 讀取失敗，HTTP 狀態碼 ${res.status}`);
+        failedFiles.push(file);
+        continue;
+      }
       const buf = await res.arrayBuffer();
       const wb = XLSX.read(buf, {type:'array'});
       let fileRecords = [];
       for(const sn of wb.SheetNames){
         fileRecords = fileRecords.concat(parseSheetToRecords(wb.Sheets[sn]));
       }
-      if(fileRecords.length === 0){ failedFiles.push(file); continue; }
+      if(fileRecords.length === 0){
+        console.warn(`[畜產儀表板] ${file} 已讀取，但找不到符合格式的資料列（檢查是否有「公司名稱」欄位標題）`);
+        failedFiles.push(file);
+        continue;
+      }
       fileRecords.forEach(r => r.year = year);
       records = records.filter(r => r.year !== year).concat(fileRecords);
       loadedYears.push(year);
+      console.log(`[畜產儀表板] ${file} 已成功匯入 ${fileRecords.length} 筆資料（${year}年）`);
     }catch(e){
+      console.error(`[畜產儀表板] ${file} 讀取發生錯誤：`, e);
       failedFiles.push(file); // network error, missing file, CORS, or not served over http(s)
     }
   }
@@ -1179,7 +1200,7 @@ async function loadSeedFiles(){
   if(statusEl && (loadedYears.length || failedFiles.length)){
     statusEl.className = failedFiles.length ? 'import-status err' : 'import-status ok';
     let msg = loadedYears.length ? `已自動載入 ${loadedYears.join('、')} 年度資料。` : '';
-    if(failedFiles.length) msg += `找不到或無法讀取：${failedFiles.join('、')}`;
+    if(failedFiles.length) msg += `找不到或無法讀取：${failedFiles.join('、')}（詳見瀏覽器 Console）`;
     statusEl.textContent = msg;
   }
 }
