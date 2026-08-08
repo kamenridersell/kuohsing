@@ -95,13 +95,13 @@
   .main-tab:hover{color:var(--text);}
   .main-tab.active{color:var(--wheat); border-bottom-color:var(--wheat); font-weight:600;}
 
-  .sub-tabs{display:flex; gap:4px; margin-top:20px; border-bottom:1px solid var(--border-soft);}
-  .sub-tab{
-    font-family:'IBM Plex Sans TC', sans-serif; font-size:14px; padding:8px 14px 10px; cursor:pointer;
-    color:var(--muted); border-bottom:2px solid transparent; user-select:none; transition:color .15s, border-color .15s;
+  .sub-tabs{display:inline-flex; gap:3px; margin-top:20px; padding:4px; background:var(--surface); border:1px solid var(--border); border-radius:10px;}
+  .sub-tab, .trend-sub-tab{
+    font-family:'IBM Plex Sans TC', sans-serif; font-size:13.5px; font-weight:600; padding:8px 18px;
+    border-radius:7px; cursor:pointer; color:var(--muted); user-select:none; transition:background .15s, color .15s;
   }
-  .sub-tab:hover{color:var(--text);}
-  .sub-tab.active{color:var(--wheat); border-bottom-color:var(--wheat); font-weight:600;}
+  .sub-tab:hover, .trend-sub-tab:hover{color:var(--text); background:var(--surface-alt);}
+  .sub-tab.active, .trend-sub-tab.active{color:#14161F; background:var(--wheat); font-weight:700;}
 
   .co-highlight{font-weight:700; color:var(--text);}
   .star-icon{color:var(--gold); font-size:.85em; margin-left:2px;}
@@ -130,6 +130,21 @@
     background:var(--surface-alt); border:1px solid var(--border); color:var(--text);
     padding:8px 10px; border-radius:6px; font-size:13px; font-family:inherit; max-width:220px; font-weight:600;
   }
+  .mini-select-label{font-size:12px; color:var(--muted); font-weight:600;}
+  .company-picker-row{display:flex; align-items:center; gap:10px; margin:-6px 0 30px;}
+  .company-picker-row select{
+    background:var(--surface-alt); border:1px solid var(--border); color:var(--text);
+    padding:9px 14px; border-radius:6px; font-size:14px; font-family:inherit; font-weight:700; max-width:280px;
+  }
+  .pie-charts-wrap{display:flex; flex-wrap:wrap; gap:24px;}
+  .pie-card{flex:1; min-width:230px; text-align:center;}
+  .pie-card .pie-year{font-family:'IBM Plex Mono',monospace; font-size:17.25px; color:var(--wheat); font-weight:700; margin-bottom:4px;}
+  .pie-card .pie-total{font-size:13.8px; color:var(--muted); margin-bottom:12px; font-weight:700;}
+  .pie-legend{display:flex; flex-direction:column; gap:5px; margin-top:14px; text-align:left; max-width:230px; margin-left:auto; margin-right:auto;}
+  .pie-legend-item{display:flex; align-items:center; gap:6px; font-size:13.8px; color:var(--text); font-weight:700;}
+  .pie-legend-swatch{width:10px; height:10px; border-radius:3px; flex-shrink:0;}
+  .pie-legend-pct{margin-left:auto; font-family:'IBM Plex Mono',monospace; color:var(--muted); font-weight:700;}
+  .pie-legend-pct-num{color:var(--wheat); font-weight:700;}
   .trend-select-group select:focus{outline:1px solid var(--wheat); border-color:var(--wheat);}
   .trend-legend{display:flex; flex-wrap:wrap; gap:16px; margin-top:14px; font-size:12.5px; color:var(--muted); font-weight:600;}
   .trend-legend-item{display:flex; align-items:center; gap:6px;}
@@ -245,6 +260,8 @@
     header h1{font-size:26px;}
     header .sub{font-size:13.5px;}
     .import-panel{width:100%; min-width:0;}
+    .sub-tabs{width:100%;}
+    .sub-tab, .trend-sub-tab{flex:1; text-align:center; padding:8px 10px; font-size:12.5px;}
     .kpi-row{grid-template-columns:repeat(2,1fr); gap:10px;}
     .kpi{padding:16px 14px;}
     .kpi .value{font-size:22px;}
@@ -282,13 +299,20 @@
   </header>
 
   <div class="main-tabs" id="mainTabs">
-    <div class="main-tab active" data-tab="trend">中長期產業趨勢</div>
-    <div class="main-tab" data-tab="single">單一年度分析</div>
+    <div class="main-tab active" data-tab="trend">趨勢分析</div>
+    <div class="main-tab" data-tab="single">年度分析</div>
   </div>
 
   <div id="tab-trend">
 
-  <div class="gauge-rule"><span>產業趨勢</span></div>
+  <div class="sub-tabs" id="trendSubTabs">
+    <div class="trend-sub-tab active" data-trendsubtab="industry">產業趨勢</div>
+    <div class="trend-sub-tab" data-trendsubtab="company">企業趨勢</div>
+  </div>
+
+  <div id="trendsubtab-industry">
+
+  <div class="gauge-rule"><span>產業趨勢分析</span></div>
   <section>
     <div class="section-head"><h2><span class="num">①</span>總產量趨勢</h2></div>
     <div class="section-desc" id="trendTotalDesc">折線標示每年全臺總產量，最多可累積並保留近 10 年資料（ 名次代表國興畜產 ）</div>
@@ -314,6 +338,62 @@
       <div id="trendFeedCompareChart"></div>
     </div>
   </section>
+
+  </div>
+
+  <div id="trendsubtab-company" style="display:none;">
+
+  <div class="gauge-rule"><span>企業選擇</span></div>
+  <div class="company-picker-row">
+    <label class="mini-select-label" for="companySharedSelect">公司</label>
+    <select id="companySharedSelect"></select>
+  </div>
+
+  <div class="gauge-rule"><span>企業趨勢分析</span></div>
+  <section>
+    <div class="section-head"><h2><span class="num">①</span>企業總產量趨勢</h2></div>
+    <div class="section-desc">該企業歷年總產量變化，並顯示與前一年比較的成長率</div>
+    <div class="panel trend-panel-black"><div id="coTotalChart"></div></div>
+  </section>
+
+  <div class="gauge-rule"><span>飼料比重</span></div>
+  <section>
+    <div class="section-head"><h2><span class="num">②</span>企業飼料產量比重</h2></div>
+    <div class="section-desc">該企業三年度，飼料種類的產量比重</div>
+    <div class="panel trend-panel-black">
+      <div class="trend-selectors" style="margin-bottom:24px;">
+        <div class="trend-select-group">
+          <label class="mini-select-label" for="pieYearSelect0">年度</label>
+          <select id="pieYearSelect0"></select>
+        </div>
+        <div class="trend-select-group">
+          <label class="mini-select-label" for="pieYearSelect1">年度</label>
+          <select id="pieYearSelect1"></select>
+        </div>
+        <div class="trend-select-group">
+          <label class="mini-select-label" for="pieYearSelect2">年度</label>
+          <select id="pieYearSelect2"></select>
+        </div>
+      </div>
+      <div id="pieChartsWrap" class="pie-charts-wrap"></div>
+    </div>
+  </section>
+
+  <div class="gauge-rule"><span>飼料趨勢</span></div>
+  <section>
+    <div class="section-head"><h2><span class="num">③</span>企業產量趨勢</h2></div>
+    <div class="section-desc">比較該企業各飼料類別歷年產量變化，一次最多可比較五種（可選「無」）</div>
+    <div class="panel trend-panel-black">
+      <div class="trend-selectors" id="trendCoFeedSelectors"></div>
+      <div id="companyFeedTrendChart"></div>
+    </div>
+  </section>
+
+  <div class="tab-footnote">
+    <p><b>公司名稱定義：</b>先以「(股)」字樣切出公司核心名稱（「股份有限公司」先正規化為「(股)」），再將彼此為子字串關係的名稱合併為同一間公司（例如「台灣卜蜂」與「台灣卜蜂企業」合併計算為「台灣卜蜂」）。不含「(股)」字樣者（如行號、商號、工廠）則各自獨立計算。此定義以113年（原始上傳資料）為基準，不論切換哪個年度或匯入新資料皆一致套用。</p>
+  </div>
+
+  </div>
 
   </div>
 
@@ -464,24 +544,18 @@
 
   </div>
 
-  <div class="tab-footnote">
-    <p><b>公司名稱定義：</b>先以「(股)」字樣切出公司核心名稱（「股份有限公司」先正規化為「(股)」），再將彼此為子字串關係的名稱合併為同一間公司（例如「台灣卜蜂」與「台灣卜蜂企業」合併計算為「台灣卜蜂」）。不含「(股)」字樣者（如行號、商號、工廠）則各自獨立計算。此定義以113年（原始上傳資料）為基準，不論切換哪個年度或匯入新資料皆一致套用。</p>
-  </div>
-
   </div>
 
   <footer>
-    <p><b>資料來源：</b>農業部「臺灣配合飼料產量調查報告」畜產配合飼料產量總表（原始載入：表3-1桃園市/苗栗縣/臺中市/彰化縣/雲林縣、表3-2嘉義縣/臺南市/高雄市、表3-3屏東縣/宜蘭縣/臺東縣）。</p>
-    <p><b>匯入資料：</b>可匯入其他縣市或年度的同格式 Excel 表（欄位需包含：縣市、公司名稱、豬、肉雞、有色雞、蛋雞、火雞、肉鴨、蛋鴨、鵝、鴕鳥、乳牛、肉牛、乳羊、肉羊、鹿、兔、濃縮飼料、其他、犬貓、小計）。匯入後所有圖表與統計即時重新計算；「小計」列會自動略過；重新匯入同一年度資料會覆蓋該年度舊資料。此功能僅在您的瀏覽器中處理資料，不會上傳到任何伺服器。若匯入按鈕無反應，可能是瀏覽器網路限制，圖表本身仍會正常顯示。</p>
     <div class="import-panel">
       <div class="import-row">
         <div class="import-year-row">
-          <label for="importYear">年度</label>
+          <label for="importYear" title="檔名沒有年度時使用">年度（備用）</label>
           <input type="number" id="importYear" min="100" value="113">
         </div>
         <label class="btn" for="fileInput">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2"/></svg>
-          匯入 Excel
+          匯入 Excel（可一次選多個檔案）
         </label>
       </div>
       <input type="file" id="fileInput" accept=".xlsx,.xls" multiple>
@@ -666,6 +740,7 @@ function computeAndRender(){
   renderTrendCompareChart(yearly);
   renderTrendFeedSelectors(yearly);
   renderTrendFeedCompareChart(yearly);
+  renderGuoxingTab();
 }
 
 function renderKPIs(grandTotal, companyList, countyList, feedList, plantCount){
@@ -787,7 +862,16 @@ function computeYearlyStats(){
       .sort((a,b)=>b.total-a.total);
     feedList.forEach((d,i)=>d.rank = i+1);
 
-    return {year:y, grandTotal, companyList:list, feedList};
+    const ghFeedTotals = {};
+    for(const c of FEED_COLS) ghFeedTotals[c] = 0;
+    for(const r of recs){
+      const key = masterCanonicalMap[rawCompanyKey(r.company)] || rawCompanyKey(r.company);
+      if(key && key.includes('國興畜產')){
+        for(const c of FEED_COLS) ghFeedTotals[c] += (r[c]||0);
+      }
+    }
+
+    return {year:y, grandTotal, companyList:list, feedList, ghFeedTotals};
   });
 }
 
@@ -900,7 +984,8 @@ function buildLineChartSVG(series, years, opts){
       }
       if(p.sublabel && opts.showSublabel !== false){
         const subY = opts.sublabelBelow ? (y+22) : (y-26);
-        seriesSvg += `<text x="${labelX.toFixed(1)}" y="${subY.toFixed(1)}" text-anchor="${labelAnchor}" font-size="10.5" fill="${s.color}" font-family="IBM Plex Sans TC, sans-serif" font-weight="600">${p.sublabel}</text>`;
+        const subColor = p.sublabelColor || s.color;
+        seriesSvg += `<text x="${labelX.toFixed(1)}" y="${subY.toFixed(1)}" text-anchor="${labelAnchor}" font-size="10.5" fill="${subColor}" font-family="IBM Plex Sans TC, sans-serif" font-weight="600">${p.sublabel}</text>`;
       }
     });
   });
@@ -926,8 +1011,17 @@ function renderTrendTotalChart(yearly){
   const descEl = document.getElementById('trendTotalDesc');
   if(yearly.length === 0){ wrap.innerHTML = '<div class="trend-empty">尚無資料</div>'; return; }
   const years = yearly.map(y=>y.year);
-  const points = yearly.map(y=>{
-    return { value: y.grandTotal, label: fmt(y.grandTotal) };
+  const points = yearly.map((y,idx)=>{
+    let sublabel = '－', sublabelColor = '#999999';
+    if(idx > 0){
+      const prev = yearly[idx-1].grandTotal;
+      if(prev > 0){
+        const g = +(((y.grandTotal-prev)/prev)*100).toFixed(1);
+        sublabel = (g > 0 ? '+' : '') + g + '%';
+        sublabelColor = g > 0 ? '#D8A930' : (g < 0 ? '#E5383B' : '#F6F2EA');
+      }
+    }
+    return { value: y.grandTotal, label: fmt(y.grandTotal), sublabel, sublabelColor };
   });
   const rankItems = yearly.map((y,idx)=>{
     const gh = y.companyList.find(d=>d.name.includes('國興畜產'));
@@ -944,7 +1038,7 @@ function renderTrendTotalChart(yearly){
   });
   const yTicks = [4500000,5500000,6500000].map(v=>({value:v, label:(v/10000)+'萬'}));
   wrap.innerHTML = buildLineChartSVG([{name:'總產量', color:'#D8A930', points}], years, {
-    height:320, yTicks, unitLabel:'單位：公噸', blackBg:true, labelFontSize: 8.47,
+    height:320, yTicks, unitLabel:'單位：公噸', blackBg:true, labelFontSize: 8.47, sublabelBelow:true,
     rankRow: { value: 4500000, offsetY: 10, items: rankItems, fontSize: 12 }
   });
   descEl.textContent = '折線標示每年全臺總產量，最多可累積並保留近 10 年資料（ 名次代表國興畜產 ）';
@@ -1090,6 +1184,249 @@ function renderTrendFeedCompareChart(yearly){
     labelFontSize: 7.7, labelColorBySeries: true
   }) + buildTrendLegend(series);
 }
+
+// ================= 企業趨勢：飼料產量比重／趨勢 =================
+const FEED_COLOR_PALETTE = ['#C9A063','#8E9AAF','#7A9E8E','#B8836A','#9C8AA5','#6E8FA3','#A6764F','#7D8471','#B08FA6','#6B8E85','#A88A6B','#87789A','#8A9B7E','#C3946E','#748CA0','#9E8672','#6F9C93','#AB8DAB'];
+const FEED_COLOR_MAP = {};
+FEED_COLS.forEach((c,i)=>{ FEED_COLOR_MAP[c] = FEED_COLOR_PALETTE[i % FEED_COLOR_PALETTE.length]; });
+
+function getCompanyFeedTotals(companyName, year){
+  const totals = {};
+  for(const c of FEED_COLS) totals[c] = 0;
+  if(!companyName) return totals;
+  records.filter(r=>r.year===year).forEach(r=>{
+    const key = masterCanonicalMap[rawCompanyKey(r.company)] || rawCompanyKey(r.company);
+    if(key === companyName){
+      for(const c of FEED_COLS) totals[c] += (r[c]||0);
+    }
+  });
+  return totals;
+}
+
+function getCompanyTotal(companyName, year){
+  if(!companyName) return 0;
+  let total = 0;
+  records.filter(r=>r.year===year).forEach(r=>{
+    const key = masterCanonicalMap[rawCompanyKey(r.company)] || rawCompanyKey(r.company);
+    if(key === companyName) total += r.subtotal;
+  });
+  return total;
+}
+
+function renderCoTotalChart(){
+  const wrap = document.getElementById('coTotalChart');
+  const years = [...new Set(records.map(r=>r.year))].sort((a,b)=>a-b).slice(-10);
+  if(years.length === 0){ wrap.innerHTML = '<div class="trend-empty">尚無資料</div>'; return; }
+  const totals = years.map(y=>getCompanyTotal(sharedSelectedCompany, y));
+  const points = totals.map((t, idx)=>{
+    let sublabel = '－', sublabelColor = '#999999';
+    if(idx > 0 && totals[idx-1] > 0){
+      const g = +(((t-totals[idx-1])/totals[idx-1])*100).toFixed(1);
+      sublabel = (g > 0 ? '+' : '') + g + '%';
+      sublabelColor = g > 0 ? '#D8A930' : (g < 0 ? '#E5383B' : '#F6F2EA');
+    }
+    return { value: t, label: fmt(t), sublabel, sublabelColor };
+  });
+  wrap.innerHTML = buildLineChartSVG([{name: sharedSelectedCompany || '', color:'#D8A930', points}], years, {
+    height:320, unitLabel:'單位：公噸', blackBg:true, labelFontSize: 8.47, sublabelBelow:true
+  });
+}
+
+function buildPieChartSVG(data, size){
+  size = size || 200;
+  const cx = size/2, cy = size/2, r = size/2 - 6;
+  const total = data.reduce((a,d)=>a+d.value,0);
+  if(total <= 0) return `<svg viewBox="0 0 ${size} ${size}" width="${size}" height="${size}"><circle cx="${cx}" cy="${cy}" r="${r}" fill="#1A2038" stroke="#3B4770"/></svg>`;
+  let angle = -90, paths = '', labels = '';
+  const toRad = a => (a * Math.PI/180);
+  data.forEach(d=>{
+    if(d.value <= 0) return;
+    const frac = d.value/total;
+    const startAngle = angle, endAngle = angle + frac*360;
+    const large = (endAngle-startAngle) > 180 ? 1 : 0;
+    const x1 = cx + r*Math.cos(toRad(startAngle)), y1 = cy + r*Math.sin(toRad(startAngle));
+    const x2 = cx + r*Math.cos(toRad(endAngle)), y2 = cy + r*Math.sin(toRad(endAngle));
+    if(frac >= 0.9999){
+      paths += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${d.color}"/>`;
+    } else {
+      paths += `<path d="M${cx},${cy} L${x1.toFixed(2)},${y1.toFixed(2)} A${r},${r} 0 ${large} 1 ${x2.toFixed(2)},${y2.toFixed(2)} Z" fill="${d.color}"/>`;
+    }
+    if(frac > 0.10){
+      const midAngle = (startAngle + endAngle) / 2;
+      const lx = cx + r*0.62*Math.cos(toRad(midAngle)), ly = cy + r*0.62*Math.sin(toRad(midAngle));
+      labels += `<text x="${lx.toFixed(2)}" y="${ly.toFixed(2)}" text-anchor="middle" dominant-baseline="middle" font-size="12.65" fill="#14161F" font-family="IBM Plex Sans TC, sans-serif" font-weight="700">${d.name}</text>`;
+    }
+    angle = endAngle;
+  });
+  return `<svg viewBox="0 0 ${size} ${size}" width="${size}" height="${size}">${paths}${labels}</svg>`;
+}
+
+function buildPieCard(year, totals){
+  if(year == null) return `<div class="pie-card"><div class="trend-empty">請選擇年度</div></div>`;
+  const entries = Object.entries(totals).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]);
+  const total = entries.reduce((a,[,v])=>a+v,0);
+  if(entries.length === 0){
+    return `<div class="pie-card"><div class="pie-year">${year}年</div><div class="trend-empty">查無資料</div></div>`;
+  }
+  const pieData = entries.map(([name,value])=>({name, value, color: FEED_COLOR_MAP[name]}));
+  const svg = buildPieChartSVG(pieData, 200);
+  const legend = entries.map(([name,value])=>
+    `<div class="pie-legend-item"><span class="pie-legend-swatch" style="background:${FEED_COLOR_MAP[name]}"></span>${name}<span class="pie-legend-pct">${fmt(value)} 公噸　<span class="pie-legend-pct-num">${(value/total*100).toFixed(1)}%</span></span></div>`
+  ).join('');
+  return `<div class="pie-card">
+    <div class="pie-year">${year}年</div>
+    <div class="pie-total">總產量 ${fmt(total)} 公噸</div>
+    ${svg}
+    <div class="pie-legend">${legend}</div>
+  </div>`;
+}
+
+let sharedSelectedCompany = null;
+let pieSelectedYears = [null, null, null];
+let pieYearsUserPicked = false; // becomes true once the user manually changes a year dropdown
+let trendCoSelectedFeeds = [null, null, null, null, null];
+
+function renderCompanySharedSelect(){
+  const years = [...new Set(records.map(r=>r.year))].sort((a,b)=>a-b);
+  const latestYear = years[years.length-1];
+  const latestTotals = {};
+  records.filter(r=>r.year===latestYear).forEach(r=>{
+    const key = masterCanonicalMap[rawCompanyKey(r.company)] || rawCompanyKey(r.company);
+    latestTotals[key] = (latestTotals[key]||0) + r.subtotal;
+  });
+  const allCompanyNames = [...new Set(records.map(r=>masterCanonicalMap[rawCompanyKey(r.company)] || rawCompanyKey(r.company)))]
+    .sort((a,b)=>{
+      const ta = latestTotals[a] ?? -1, tb = latestTotals[b] ?? -1;
+      if(tb !== ta) return tb - ta; // 依最近年度產量（名次）排序
+      return a.localeCompare(b,'zh-Hant');
+    });
+  if(!sharedSelectedCompany || !allCompanyNames.includes(sharedSelectedCompany)){
+    sharedSelectedCompany = allCompanyNames.find(n=>n.includes('國興畜產')) || allCompanyNames[0] || null;
+  }
+  const companySelect = document.getElementById('companySharedSelect');
+  const existing = [...companySelect.options].map(o=>o.value);
+  if(existing.join('|') !== allCompanyNames.join('|')){
+    companySelect.innerHTML = allCompanyNames.map(n=>`<option value="${n}">${n}${n.includes('國興畜產') ? ' ★' : ''}</option>`).join('');
+  }
+  companySelect.value = sharedSelectedCompany;
+  if(companySelect.dataset.built !== '1'){
+    companySelect.addEventListener('change', ()=>{
+      sharedSelectedCompany = companySelect.value;
+      trendCoSelectedFeeds = [null, null, null, null, null]; // reset so defaults recompute for new company
+      renderCoTotalChart();
+      renderPieCharts();
+      renderTrendCoSection();
+    });
+    companySelect.dataset.built = '1';
+  }
+}
+
+function renderPieSection(){
+  const years = [...new Set(records.map(r=>r.year))].sort((a,b)=>a-b);
+  if(!pieYearsUserPicked){
+    const last3 = years.slice(-3).reverse(); // 最近年度排在最前面
+    const latest = years[years.length-1] || null;
+    pieSelectedYears = [last3[0] ?? latest, last3[1] ?? latest, last3[2] ?? latest];
+  }
+
+  ['pieYearSelect0','pieYearSelect1','pieYearSelect2'].forEach((id, idx)=>{
+    const sel = document.getElementById(id);
+    sel.innerHTML = years.map(y=>`<option value="${y}">${y}年</option>`).join('');
+    sel.value = pieSelectedYears[idx] != null ? pieSelectedYears[idx] : (years[years.length-1]||'');
+    if(sel.dataset.built !== '1'){
+      sel.addEventListener('change', ()=>{
+        pieSelectedYears[idx] = parseInt(sel.value, 10);
+        pieYearsUserPicked = true;
+        renderPieCharts();
+      });
+      sel.dataset.built = '1';
+    }
+  });
+
+  renderPieCharts();
+}
+
+function renderPieCharts(){
+  const wrap = document.getElementById('pieChartsWrap');
+  wrap.innerHTML = pieSelectedYears.map(year=>{
+    if(year == null) return `<div class="pie-card"><div class="trend-empty">請選擇年度</div></div>`;
+    const totals = getCompanyFeedTotals(sharedSelectedCompany, year);
+    return buildPieCard(year, totals);
+  }).join('');
+}
+
+function renderTrendCoSection(){
+  const years = [...new Set(records.map(r=>r.year))].sort((a,b)=>a-b);
+
+  if(trendCoSelectedFeeds.every(v=>v===null)){
+    const latestYear = years[years.length-1];
+    const totals = getCompanyFeedTotals(sharedSelectedCompany, latestYear);
+    const top5 = Object.entries(totals).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([name])=>name);
+    trendCoSelectedFeeds = [top5[0]||null, top5[1]||null, top5[2]||null, top5[3]||null, top5[4]||null];
+  }
+
+  renderTrendCoFeedSelectors();
+  renderTrendCoChart();
+}
+
+function renderTrendCoFeedSelectors(){
+  const wrap = document.getElementById('trendCoFeedSelectors');
+  wrap.innerHTML = '';
+  trendCoSelectedFeeds.forEach((sel, idx)=>{
+    const group = document.createElement('div');
+    group.className = 'trend-select-group';
+    const swatch = document.createElement('span');
+    swatch.className = 'trend-swatch';
+    swatch.style.background = sel ? FEED_COLOR_MAP[sel] : '#3B4770';
+    const select = document.createElement('select');
+    const noneOpt = document.createElement('option');
+    noneOpt.value = ''; noneOpt.textContent = '無';
+    if(!sel) noneOpt.selected = true;
+    select.appendChild(noneOpt);
+    FEED_COLS.forEach(name=>{
+      const opt = document.createElement('option');
+      opt.value = name; opt.textContent = name;
+      if(name === sel) opt.selected = true;
+      select.appendChild(opt);
+    });
+    select.addEventListener('change', ()=>{
+      trendCoSelectedFeeds[idx] = select.value || null;
+      renderTrendCoChart();
+    });
+    group.appendChild(swatch);
+    group.appendChild(select);
+    wrap.appendChild(group);
+  });
+}
+
+function renderTrendCoChart(){
+  const wrap = document.getElementById('companyFeedTrendChart');
+  const years = [...new Set(records.map(r=>r.year))].sort((a,b)=>a-b).slice(-10);
+  if(years.length === 0){ wrap.innerHTML = '<div class="trend-empty">尚無資料</div>'; return; }
+  const perYearTotals = years.map(y=>getCompanyFeedTotals(sharedSelectedCompany, y));
+  const series = trendCoSelectedFeeds.map(name=>{
+    if(!name) return null;
+    const points = perYearTotals.map(totals=>{
+      const v = totals[name];
+      if(v == null || v <= 0) return null;
+      return { value: v, label: fmt(v) };
+    });
+    return { name, color: FEED_COLOR_MAP[name], points };
+  }).filter(Boolean);
+  if(series.length === 0){ wrap.innerHTML = '<div class="trend-empty">請選擇要比較的飼料類別</div>'; return; }
+  wrap.innerHTML = buildLineChartSVG(series, years, {
+    height:320, unitLabel:'單位：公噸', blackBg:true, showSublabel:false,
+    labelFontSize: 7.7, labelColorBySeries: true
+  }) + buildTrendLegend(series);
+}
+
+function renderGuoxingTab(){
+  renderCompanySharedSelect();
+  renderCoTotalChart();
+  renderPieSection();
+  renderTrendCoSection();
+}
+
 
 function renderCounties(counties){
   const top5 = counties.slice(0,5);
@@ -1349,6 +1686,16 @@ document.querySelectorAll('.main-tab').forEach(tab=>{
   });
 });
 
+document.querySelectorAll('.trend-sub-tab').forEach(tab=>{
+  tab.addEventListener('click', ()=>{
+    document.querySelectorAll('.trend-sub-tab').forEach(t=>t.classList.remove('active'));
+    tab.classList.add('active');
+    const target = tab.dataset.trendsubtab;
+    document.getElementById('trendsubtab-industry').style.display = target === 'industry' ? '' : 'none';
+    document.getElementById('trendsubtab-company').style.display = target === 'company' ? '' : 'none';
+  });
+});
+
 document.querySelectorAll('.sub-tab').forEach(tab=>{
   tab.addEventListener('click', ()=>{
     document.querySelectorAll('.sub-tab').forEach(t=>t.classList.remove('active'));
@@ -1361,61 +1708,6 @@ document.querySelectorAll('.sub-tab').forEach(tab=>{
 
 computeAndRender();
 loadPersistedRecords();
-
-// ================= AUTO-LOAD SEED FILES (same directory as this page) =================
-const SEED_FILES = [
-  {year:108, file:'feed_production_108.xlsx'},
-  {year:109, file:'feed_production_109.xlsx'},
-  {year:110, file:'feed_production_110.xlsx'},
-  {year:111, file:'feed_production_111.xlsx'},
-  {year:112, file:'feed_production_112.xlsx'},
-  {year:113, file:'feed_production_113.xlsx'},
-  {year:114, file:'feed_production_114.xlsx'},
-];
-
-async function loadSeedFiles(){
-  if(typeof XLSX === 'undefined'){ console.warn('[畜產儀表板] XLSX 套件未載入，無法自動匯入'); return; }
-  const statusEl = document.getElementById('importStatus');
-  const loadedYears = [], failedFiles = [];
-  for(const {year, file} of SEED_FILES){
-    try{
-      const res = await fetch(file, {cache:'no-store'});
-      if(!res.ok){
-        console.warn(`[畜產儀表板] ${file} 讀取失敗，HTTP 狀態碼 ${res.status}`);
-        failedFiles.push(file);
-        continue;
-      }
-      const buf = await res.arrayBuffer();
-      const wb = XLSX.read(buf, {type:'array'});
-      let fileRecords = [];
-      for(const sn of wb.SheetNames){
-        fileRecords = fileRecords.concat(parseSheetToRecords(wb.Sheets[sn]));
-      }
-      if(fileRecords.length === 0){
-        console.warn(`[畜產儀表板] ${file} 已讀取，但找不到符合格式的資料列（檢查是否有「公司名稱」欄位標題）`);
-        failedFiles.push(file);
-        continue;
-      }
-      fileRecords.forEach(r => r.year = year);
-      records = records.filter(r => r.year !== year).concat(fileRecords);
-      loadedYears.push(year);
-      console.log(`[畜產儀表板] ${file} 已成功匯入 ${fileRecords.length} 筆資料（${year}年）`);
-    }catch(e){
-      console.error(`[畜產儀表板] ${file} 讀取發生錯誤：`, e);
-      failedFiles.push(file); // network error, missing file, CORS, or not served over http(s)
-    }
-  }
-  if(loadedYears.length){
-    computeAndRender();
-  }
-  if(statusEl && (loadedYears.length || failedFiles.length)){
-    statusEl.className = failedFiles.length ? 'import-status err' : 'import-status ok';
-    let msg = loadedYears.length ? `已自動載入 ${loadedYears.join('、')} 年度資料。` : '';
-    if(failedFiles.length) msg += `找不到或無法讀取：${failedFiles.join('、')}（詳見瀏覽器 Console）`;
-    statusEl.textContent = msg;
-  }
-}
-loadSeedFiles();
 
 // ================= IMPORT =================
 function parseSheetToRecords(sheet){
@@ -1457,6 +1749,11 @@ function parseSheetToRecords(sheet){
   return out;
 }
 
+function detectYearFromFilename(name){
+  const m = name.match(/(\d{2,3})\s*\.xlsx?$/i);
+  return m ? parseInt(m[1], 10) : null;
+}
+
 document.getElementById('fileInput').addEventListener('change', async (e)=>{
   const files = [...e.target.files];
   if(!files.length) return;
@@ -1464,23 +1761,24 @@ document.getElementById('fileInput').addEventListener('change', async (e)=>{
   statusEl.className = 'import-status';
 
   const yearInput = document.getElementById('importYear');
-  const importYear = parseInt(yearInput.value, 10);
-  if(!importYear || importYear < 100){
-    statusEl.className = 'import-status err';
-    statusEl.textContent = '請輸入有效的民國年份（最早需為100年）。';
-    e.target.value = '';
-    return;
-  }
+  const fallbackYear = parseInt(yearInput.value, 10);
 
   if(typeof XLSX === 'undefined'){
     statusEl.className = 'import-status err';
-    statusEl.textContent = '匯入功能需要網路連線以載入 Excel 解析套件，目前無法使用。';
+    statusEl.textContent = 'Excel 解析套件尚未載入完成，請稍候片刻再試一次。';
     e.target.value = '';
     return;
   }
   statusEl.textContent = '解析中…';
-  let batchRecords = [], addedFiles = 0, errors = [];
+  const byYear = {};
+  let addedFiles = 0, errors = [];
   for(const file of files){
+    const detectedYear = detectYearFromFilename(file.name);
+    const yr = detectedYear || fallbackYear;
+    if(!yr || yr < 100){
+      errors.push(file.name + '（無法判斷年度：請在檔名中包含民國年，如 feed_production_108.xlsx，或於「年度」欄位填入民國年）');
+      continue;
+    }
     try{
       const buf = await file.arrayBuffer();
       const wb = XLSX.read(buf, {type:'array'});
@@ -1490,25 +1788,30 @@ document.getElementById('fileInput').addEventListener('change', async (e)=>{
         fileRecords = fileRecords.concat(recs);
       }
       if(fileRecords.length === 0){ errors.push(file.name + '（找不到符合格式的資料列）'); continue; }
-      fileRecords.forEach(r => r.year = importYear);
-      batchRecords = batchRecords.concat(fileRecords);
+      fileRecords.forEach(r => r.year = yr);
+      (byYear[yr] = byYear[yr] || []).push(...fileRecords);
       addedFiles++;
     }catch(err){
       errors.push(file.name + '（' + err.message + '）');
     }
   }
-  if(batchRecords.length > 0){
+  const yearsTouched = Object.keys(byYear).map(Number).sort((a,b)=>a-b);
+  let totalRecords = 0;
+  yearsTouched.forEach(yr=>{
     // 重新匯入同一年度的資料時，覆蓋（取代）該年度先前的舊資料
-    records = records.filter(r => r.year !== importYear).concat(batchRecords);
+    records = records.filter(r => r.year !== yr).concat(byYear[yr]);
+    totalRecords += byYear[yr].length;
+  });
+  if(yearsTouched.length > 0){
     computeAndRender();
     await persistImportedRecords();
   }
   if(errors.length){
     statusEl.className = 'import-status err';
-    statusEl.textContent = `已匯入 ${addedFiles} 個檔案、共 ${batchRecords.length} 筆${importYear}年資料（已覆蓋該年度舊資料）。失敗：${errors.join('；')}`;
-  } else if(batchRecords.length > 0){
+    statusEl.textContent = `已匯入 ${addedFiles} 個檔案、共 ${totalRecords} 筆資料（涵蓋 ${yearsTouched.join('、')} 年度，已覆蓋各該年度舊資料）。失敗：${errors.join('；')}`;
+  } else if(totalRecords > 0){
     statusEl.className = 'import-status ok';
-    statusEl.textContent = `已匯入 ${addedFiles} 個檔案、共 ${batchRecords.length} 筆${importYear}年廠商資料（已覆蓋該年度舊資料），圖表已更新。`;
+    statusEl.textContent = `已匯入 ${addedFiles} 個檔案、共 ${totalRecords} 筆資料（涵蓋 ${yearsTouched.join('、')} 年度，已覆蓋各該年度舊資料），圖表已更新。`;
   }
   e.target.value = '';
 });
