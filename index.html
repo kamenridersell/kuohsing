@@ -155,6 +155,7 @@
   .kpi .foot{font-size:12px; color:var(--muted-2); margin-top:6px;}
 
   section{margin-top:8px;}
+  #subtab-lookup section + section{margin-top:52px; padding-top:36px; border-top:1px solid var(--border-soft);}
   .section-head{display:flex; align-items:baseline; justify-content:space-between; gap:20px; flex-wrap:wrap;}
   .section-head h2{font-size:22px; color:var(--text);}
   .section-head .num{color:var(--wheat); font-family:'IBM Plex Mono',monospace; font-size:14px; margin-right:10px;}
@@ -369,13 +370,13 @@
   <div class="gauge-rule"><span>03 — 關鍵工廠</span></div>
   <section>
     <div class="section-head"><h2><span class="num">③</span>前五大飼料與關鍵工廠</h2></div>
-    <div class="section-desc">依產量排序前五大飼料類別，並列出各類別產量最高的三家公司</div>
+    <div class="section-desc">依產量排序前五大飼料類別，並列出各類別產量最高的五家公司</div>
     <div id="feedCompanyBreakdown"></div>
   </section>
 
   <div class="gauge-rule"><span>04 — 地理分布</span></div>
   <section>
-    <div class="section-head"><h2><span class="num">④</span>各縣市畜產飼料產量 <span class="head-stat" id="countyHeadStat"></span></h2></div>
+    <div class="section-head"><h2><span class="num">④</span>前五大縣市畜產飼料產量 <span class="head-stat" id="countyHeadStat"></span></h2></div>
     <div class="panel"><div id="countyBars"></div></div>
   </section>
 
@@ -405,6 +406,57 @@
             </tr>
           </thead>
           <tbody id="companyTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head"><h2><span class="num">⌕</span>各飼料產量明細查詢</h2></div>
+    <div class="section-desc">可依欄位排序或以飼料類別搜尋，點選飼料列可展開查看各公司在該類別的產量</div>
+    <div class="panel">
+      <div class="search-row">
+        <input type="text" id="feedSearchBox" placeholder="搜尋飼料類別…">
+        <span class="hint" id="feedSearchHint"></span>
+      </div>
+      <div class="table-scroll" style="margin-top:14px;">
+        <table>
+          <thead>
+            <tr>
+              <th data-feed-key="rank">#</th>
+              <th data-feed-key="name">飼料類別</th>
+              <th data-feed-key="total">產量（公噸）</th>
+              <th data-feed-key="growth">成長率</th>
+              <th data-feed-key="share">市占率</th>
+            </tr>
+          </thead>
+          <tbody id="feedTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head"><h2><span class="num">⌕</span>各縣市產量明細查詢</h2></div>
+    <div class="section-desc">可依欄位排序或以縣市搜尋，點選縣市列可展開查看各公司在該縣市的產量</div>
+    <div class="panel">
+      <div class="search-row">
+        <input type="text" id="countySearchBox" placeholder="搜尋縣市…">
+        <span class="hint" id="countySearchHint"></span>
+      </div>
+      <div class="table-scroll" style="margin-top:14px;">
+        <table>
+          <thead>
+            <tr>
+              <th data-county-key="rank">#</th>
+              <th data-county-key="name">縣市</th>
+              <th data-county-key="companyCount">生產公司數</th>
+              <th data-county-key="total">產量（公噸）</th>
+              <th data-county-key="growth">成長率</th>
+              <th data-county-key="share">市占率</th>
+            </tr>
+          </thead>
+          <tbody id="countyTableBody"></tbody>
         </table>
       </div>
     </div>
@@ -542,12 +594,13 @@ function computeAndRender(){
   const companyKey = rawName => masterCanonicalMap[rawCompanyKey(rawName)];
 
   // ---- previous-year totals (for growth-rate comparisons) ----
-  const prevCompanyTotals = {}, prevColTotals = {};
+  const prevCompanyTotals = {}, prevColTotals = {}, prevCountyTotals = {};
   for(const c of FEED_COLS) prevColTotals[c] = 0;
   for(const r of prevRecs){
     const key = companyKey(r.company);
     prevCompanyTotals[key] = (prevCompanyTotals[key]||0) + r.subtotal;
     for(const c of FEED_COLS) prevColTotals[c] += (r[c]||0);
+    prevCountyTotals[r.county] = (prevCountyTotals[r.county]||0) + r.subtotal;
   }
   const growthVs = (total, prev) => (prev != null && prev > 0) ? +(((total-prev)/prev)*100).toFixed(1) : null;
 
@@ -581,6 +634,7 @@ function computeAndRender(){
     .filter(([,v])=>v>0)
     .map(([name,total])=>({name, total, share:+(total/colGrand*100).toFixed(2), growth: growthVs(total, prevColTotals[name])}))
     .sort((a,b)=>b.total-a.total);
+  feedList.forEach((d,i)=>d.rank = i+1);
 
   // ---- county aggregation ----
   const countyTotals = {}, countyCompanies = {};
@@ -590,18 +644,21 @@ function computeAndRender(){
     countyCompanies[r.county].add(companyKey(r.company));
   }
   const countyList = Object.entries(countyTotals)
-    .map(([name,total])=>({name, total, share:+(total/grandTotal*100).toFixed(2), companyCount: countyCompanies[name].size}))
+    .map(([name,total])=>({name, total, share:+(total/grandTotal*100).toFixed(2), companyCount: countyCompanies[name].size, growth: growthVs(total, prevCountyTotals[name])}))
     .sort((a,b)=>b.total-a.total);
+  countyList.forEach((d,i)=>d.rank = i+1);
 
   renderKPIs(grandTotal, companyList, countyList, feedList, recs.length);
   renderTop10(companyList.slice(0,5), companyColTotals);
   renderFeed(feedList.slice(0,5));
   renderFeedCompanyBreakdown(feedList.slice(0,5), recs, companyKey);
   renderCounties(countyList);
+  renderCountyTable(countyList);
   currentRecs = recs;
   currentCompanyKeyFn = companyKey;
   expandedCompanies.clear();
   renderTable(companyList);
+  renderFeedTable(feedList);
 
   const yearly = computeYearlyStats();
   renderTrendTotalChart(yearly);
@@ -678,14 +735,14 @@ function renderFeedCompanyBreakdown(topFeeds, recs, companyKey){
       const key = companyKey(r.company);
       companyFeedTotals[key] = (companyFeedTotals[key]||0) + (r[feed.name]||0);
     }
-    const top3 = Object.entries(companyFeedTotals)
+    const top5 = Object.entries(companyFeedTotals)
       .filter(([,v])=>v>0)
       .sort((a,b)=>b[1]-a[1])
-      .slice(0,3);
+      .slice(0,5);
     const card = document.createElement('div');
     card.className = 'fc-card';
     let rowsHtml = '';
-    top3.forEach(([name,total],i)=>{
+    top5.forEach(([name,total],i)=>{
       const pct = (total/feed.total*100).toFixed(1);
       rowsHtml += `<div class="fc-row">
         <span class="fc-rank ${i===0?'top1':''}">${i+1}</span>
@@ -1042,7 +1099,7 @@ function renderCounties(counties){
   const wrap = document.getElementById('countyBars');
   wrap.innerHTML = '';
   const maxVal = counties[0].total;
-  counties.forEach((d,i)=>{
+  top5.forEach((d,i)=>{
     const tag = `${d.companyCount} 家公司`;
     wrap.appendChild(makeBarRow(i+1, d.name, tag, d.total, maxVal, d.share, 'county-fill'));
   });
@@ -1052,6 +1109,14 @@ let currentCompanyList = [];
 let sortKey = 'rank', sortDir = 1;
 let currentRecs = [], currentCompanyKeyFn = null;
 let expandedCompanies = new Set();
+
+let currentFeedList = [];
+let feedSortKey = 'rank', feedSortDir = 1;
+let expandedFeeds = new Set();
+
+let currentCountyList = [];
+let countySortKey = 'rank', countySortDir = 1;
+let expandedCounties = new Set();
 
 function buildCompanyDetail(companyName){
   const wrap = document.createElement('div');
@@ -1127,6 +1192,152 @@ document.querySelectorAll('th[data-key]').forEach(th=>{
   });
 });
 document.getElementById('searchBox').addEventListener('input', applyTableView);
+
+function buildFeedDetail(feedName){
+  const wrap = document.createElement('div');
+  wrap.className = 'co-detail';
+  const byCompany = {};
+  currentRecs.forEach(r=>{
+    const v = r[feedName];
+    if(!v) return;
+    const key = currentCompanyKeyFn(r.company);
+    byCompany[key] = (byCompany[key]||0) + v;
+  });
+  const entries = Object.entries(byCompany).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]);
+  const total = entries.reduce((a,[,v])=>a+v,0) || 1;
+  const rowsHtml = entries.map(([name,val])=>
+    `<span class="co-detail-feed">${highlightName(name)} <b>${fmt(val)}</b> 噸　(${(val/total*100).toFixed(1)}%)</span>`
+  ).join('');
+  const block = document.createElement('div');
+  block.className = 'co-detail-county';
+  block.innerHTML = `<div class="co-detail-county-name">生產公司</div><div class="co-detail-feeds">${rowsHtml || '無資料'}</div>`;
+  wrap.appendChild(block);
+  return wrap;
+}
+
+function renderFeedTable(feedList){
+  currentFeedList = feedList;
+  applyFeedTableView();
+}
+function applyFeedTableView(){
+  let list = [...currentFeedList];
+  const q = document.getElementById('feedSearchBox').value.trim();
+  if(q) list = list.filter(d => d.name.includes(q));
+  list.sort((a,b)=>{
+    let av = a[feedSortKey], bv = b[feedSortKey];
+    if(feedSortKey==='growth'){ av = av==null ? -Infinity : av; bv = bv==null ? -Infinity : bv; }
+    if(typeof av === 'string') return av.localeCompare(bv) * feedSortDir;
+    return (av - bv) * feedSortDir;
+  });
+  const body = document.getElementById('feedTableBody');
+  body.innerHTML = '';
+  list.forEach(d=>{
+    const tr = document.createElement('tr');
+    tr.className = 'company-row';
+    tr.innerHTML = `<td class="num">${d.rank}</td>
+      <td class="company-name-cell">${d.name}</td>
+      <td class="num">${fmt(d.total)}</td>
+      <td class="num growth-cell">${growthHTML(d.growth)}</td>
+      <td class="num">${d.share}%</td>`;
+    tr.addEventListener('click', ()=>{
+      if(expandedFeeds.has(d.name)) expandedFeeds.delete(d.name);
+      else expandedFeeds.add(d.name);
+      applyFeedTableView();
+    });
+    body.appendChild(tr);
+    if(expandedFeeds.has(d.name)){
+      const detailTr = document.createElement('tr');
+      detailTr.className = 'company-detail-row';
+      const td = document.createElement('td');
+      td.colSpan = 5;
+      td.appendChild(buildFeedDetail(d.name));
+      detailTr.appendChild(td);
+      body.appendChild(detailTr);
+    }
+  });
+  document.getElementById('feedSearchHint').textContent = `顯示 ${list.length} / ${currentFeedList.length} 種飼料類別`;
+}
+document.querySelectorAll('th[data-feed-key]').forEach(th=>{
+  th.addEventListener('click', ()=>{
+    const key = th.dataset.feedKey;
+    if(feedSortKey === key) feedSortDir *= -1; else { feedSortKey = key; feedSortDir = 1; }
+    applyFeedTableView();
+  });
+});
+document.getElementById('feedSearchBox').addEventListener('input', applyFeedTableView);
+
+function buildCountyDetail(countyName){
+  const wrap = document.createElement('div');
+  wrap.className = 'co-detail';
+  const byCompany = {};
+  currentRecs.forEach(r=>{
+    if(r.county !== countyName) return;
+    const key = currentCompanyKeyFn(r.company);
+    byCompany[key] = (byCompany[key]||0) + r.subtotal;
+  });
+  const entries = Object.entries(byCompany).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]);
+  const total = entries.reduce((a,[,v])=>a+v,0) || 1;
+  const rowsHtml = entries.map(([name,val])=>
+    `<span class="co-detail-feed">${highlightName(name)} <b>${fmt(val)}</b> 噸　(${(val/total*100).toFixed(1)}%)</span>`
+  ).join('');
+  const block = document.createElement('div');
+  block.className = 'co-detail-county';
+  block.innerHTML = `<div class="co-detail-county-name">生產公司</div><div class="co-detail-feeds">${rowsHtml || '無資料'}</div>`;
+  wrap.appendChild(block);
+  return wrap;
+}
+
+function renderCountyTable(countyList){
+  currentCountyList = countyList;
+  applyCountyTableView();
+}
+function applyCountyTableView(){
+  let list = [...currentCountyList];
+  const q = document.getElementById('countySearchBox').value.trim();
+  if(q) list = list.filter(d => d.name.includes(q));
+  list.sort((a,b)=>{
+    let av = a[countySortKey], bv = b[countySortKey];
+    if(countySortKey==='growth'){ av = av==null ? -Infinity : av; bv = bv==null ? -Infinity : bv; }
+    if(typeof av === 'string') return av.localeCompare(bv) * countySortDir;
+    return (av - bv) * countySortDir;
+  });
+  const body = document.getElementById('countyTableBody');
+  body.innerHTML = '';
+  list.forEach(d=>{
+    const tr = document.createElement('tr');
+    tr.className = 'company-row';
+    tr.innerHTML = `<td class="num">${d.rank}</td>
+      <td class="company-name-cell">${d.name}</td>
+      <td class="num">${d.companyCount}</td>
+      <td class="num">${fmt(d.total)}</td>
+      <td class="num growth-cell">${growthHTML(d.growth)}</td>
+      <td class="num">${d.share}%</td>`;
+    tr.addEventListener('click', ()=>{
+      if(expandedCounties.has(d.name)) expandedCounties.delete(d.name);
+      else expandedCounties.add(d.name);
+      applyCountyTableView();
+    });
+    body.appendChild(tr);
+    if(expandedCounties.has(d.name)){
+      const detailTr = document.createElement('tr');
+      detailTr.className = 'company-detail-row';
+      const td = document.createElement('td');
+      td.colSpan = 6;
+      td.appendChild(buildCountyDetail(d.name));
+      detailTr.appendChild(td);
+      body.appendChild(detailTr);
+    }
+  });
+  document.getElementById('countySearchHint').textContent = `顯示 ${list.length} / ${currentCountyList.length} 個縣市`;
+}
+document.querySelectorAll('th[data-county-key]').forEach(th=>{
+  th.addEventListener('click', ()=>{
+    const key = th.dataset.countyKey;
+    if(countySortKey === key) countySortDir *= -1; else { countySortKey = key; countySortDir = 1; }
+    applyCountyTableView();
+  });
+});
+document.getElementById('countySearchBox').addEventListener('input', applyCountyTableView);
 
 document.querySelectorAll('.main-tab').forEach(tab=>{
   tab.addEventListener('click', ()=>{
