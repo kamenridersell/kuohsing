@@ -1754,6 +1754,61 @@ function detectYearFromFilename(name){
   return m ? parseInt(m[1], 10) : null;
 }
 
+// ================= AUTO-LOAD SEED FILES (same directory as this page) =================
+const SEED_FILES = [
+  {year:108, file:'feed_production_108.xlsx'},
+  {year:109, file:'feed_production_109.xlsx'},
+  {year:110, file:'feed_production_110.xlsx'},
+  {year:111, file:'feed_production_111.xlsx'},
+  {year:112, file:'feed_production_112.xlsx'},
+  {year:113, file:'feed_production_113.xlsx'},
+  {year:114, file:'feed_production_114.xlsx'},
+];
+
+async function loadSeedFiles(){
+  if(typeof XLSX === 'undefined'){ console.warn('[畜產儀表板] XLSX 套件未載入，無法自動匯入'); return; }
+  const statusEl = document.getElementById('importStatus');
+  const loadedYears = [], failedFiles = [];
+  for(const {year, file} of SEED_FILES){
+    try{
+      const res = await fetch(file, {cache:'no-store'});
+      if(!res.ok){
+        console.warn(`[畜產儀表板] ${file} 讀取失敗，HTTP 狀態碼 ${res.status}`);
+        failedFiles.push(file);
+        continue;
+      }
+      const buf = await res.arrayBuffer();
+      const wb = XLSX.read(buf, {type:'array'});
+      let fileRecords = [];
+      for(const sn of wb.SheetNames){
+        fileRecords = fileRecords.concat(parseSheetToRecords(wb.Sheets[sn]));
+      }
+      if(fileRecords.length === 0){
+        console.warn(`[畜產儀表板] ${file} 已讀取，但找不到符合格式的資料列（檢查是否有「公司名稱」欄位標題）`);
+        failedFiles.push(file);
+        continue;
+      }
+      fileRecords.forEach(r => r.year = year);
+      records = records.filter(r => r.year !== year).concat(fileRecords);
+      loadedYears.push(year);
+      console.log(`[畜產儀表板] ${file} 已成功匯入 ${fileRecords.length} 筆資料（${year}年）`);
+    }catch(e){
+      console.error(`[畜產儀表板] ${file} 讀取發生錯誤：`, e);
+      failedFiles.push(file); // network error, missing file, CORS, or not served over http(s)
+    }
+  }
+  if(loadedYears.length){
+    computeAndRender();
+  }
+  if(statusEl && (loadedYears.length || failedFiles.length)){
+    statusEl.className = failedFiles.length ? 'import-status err' : 'import-status ok';
+    let msg = loadedYears.length ? `已自動載入 ${loadedYears.join('、')} 年度資料。` : '';
+    if(failedFiles.length) msg += `找不到或無法讀取：${failedFiles.join('、')}（詳見瀏覽器 Console）`;
+    statusEl.textContent = msg;
+  }
+}
+loadSeedFiles();
+
 document.getElementById('fileInput').addEventListener('change', async (e)=>{
   const files = [...e.target.files];
   if(!files.length) return;
