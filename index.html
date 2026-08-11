@@ -67,7 +67,7 @@
   .import-status.ok{color:var(--forest);}
   .import-status.err{color:var(--clay);}
 
-  .year-tabs{display:flex; gap:8px; flex-wrap:wrap; margin-top:22px;}
+  .year-tabs{display:flex; gap:8px; flex-wrap:wrap; margin-top:22px; margin-bottom:24px;}
   .year-tab{
     font-family:'IBM Plex Mono',monospace; font-size:13px; padding:7px 14px;
     border:none; border-radius:20px; background:#000000; position:relative;
@@ -87,21 +87,23 @@
   }
   .import-year-row input:focus{outline:1px solid var(--wheat); border-color:var(--wheat);}
 
-  .main-tabs{display:flex; gap:6px; margin-top:24px; border-bottom:1px solid var(--border); padding-bottom:0;}
+  .main-tabs-row{display:flex; flex-direction:column; gap:14px; margin-top:24px; padding-bottom:20px; border-bottom:1px solid var(--border);}
+  .main-tab-line{display:flex; align-items:center; gap:16px; flex-wrap:wrap;}
   .main-tab{
-    font-family:'Fraunces',Georgia,serif; font-size:16px; padding:10px 18px 12px; cursor:pointer;
-    color:var(--muted); border-bottom:2px solid transparent; user-select:none; transition:color .15s, border-color .15s;
+    font-family:'Fraunces',Georgia,serif; font-size:16px; cursor:pointer;
+    color:var(--muted); user-select:none; transition:color .15s; font-weight:500;
   }
   .main-tab:hover{color:var(--text);}
-  .main-tab.active{color:var(--wheat); border-bottom-color:var(--wheat); font-weight:600;}
+  .main-tab.active{color:var(--wheat); font-weight:700;}
 
-  .sub-tabs{display:inline-flex; gap:3px; margin-top:20px; padding:4px; background:var(--surface); border:1px solid var(--border); border-radius:10px;}
+  .sub-tabs-divider{width:1px; height:20px; background:var(--border);}
+  .sub-tabs{display:inline-flex; gap:3px; padding:4px; background:var(--surface); border:1px solid var(--border); border-radius:10px;}
   .sub-tab, .trend-sub-tab{
     font-family:'IBM Plex Sans TC', sans-serif; font-size:13.5px; font-weight:600; padding:8px 18px;
     border-radius:7px; cursor:pointer; color:var(--muted); user-select:none; transition:background .15s, color .15s;
   }
   .sub-tab:hover, .trend-sub-tab:hover{color:var(--text); background:var(--surface-alt);}
-  .sub-tab.active, .trend-sub-tab.active{color:#14161F; background:var(--wheat); font-weight:700;}
+  .main-tab-line.is-active .sub-tab.active, .main-tab-line.is-active .trend-sub-tab.active{color:#14161F; background:var(--wheat); font-weight:700;}
 
   .co-highlight{font-weight:700; color:var(--text);}
   .star-icon{color:var(--gold); font-size:.85em; margin-left:2px;}
@@ -147,6 +149,38 @@
   .pie-legend-pct-num{color:var(--wheat); font-weight:700;}
   .trend-select-group select:focus{outline:1px solid var(--wheat); border-color:var(--wheat);}
   .trend-legend{display:flex; flex-wrap:wrap; gap:16px; margin-top:14px; font-size:12.5px; color:var(--muted); font-weight:600;}
+  .trend-chart-overlay{position:relative;}
+  .trend-legend-topright{position:absolute; top:14px; right:20px; margin:0; flex-direction:row; align-items:center; gap:16px; flex-wrap:nowrap; white-space:nowrap;}
+  .cagr-btn{
+    position:absolute; top:14px; left:20px; background:none; border:1px solid var(--wheat); color:var(--wheat);
+    font-family:'IBM Plex Mono',monospace; font-size:12.5px; font-weight:700; padding:5px 12px; border-radius:20px;
+    cursor:pointer; user-select:none; transition:background .15s;
+  }
+  .cagr-btn:hover{background:rgba(216,169,48,0.12);}
+  .cagr-btn::after{content:' ▾'; font-size:10px;}
+  .cagr-popover{
+    position:absolute; top:46px; left:20px; z-index:5; max-width:320px; background:var(--surface);
+    border:1px solid var(--border); border-radius:8px; padding:14px 16px; box-shadow:var(--shadow-card);
+    font-size:12px; color:var(--muted); line-height:1.7;
+  }
+  .cagr-popover b{color:var(--text);}
+  .mini-cagr-slot{margin-top:6px; font-size:11px; position:relative;}
+  .mini-cagr-btn{
+    font-family:'IBM Plex Mono',monospace; font-weight:700; font-size:11px; background:none;
+    border:1px solid var(--border); border-radius:12px; padding:3px 9px; cursor:pointer; user-select:none;
+    transition:background .15s;
+  }
+  .mini-cagr-btn:hover{background:var(--surface-alt);}
+  .mini-cagr-btn.up{color:var(--gold); border-color:var(--gold);}
+  .mini-cagr-btn.down{color:var(--bright-red); border-color:var(--bright-red);}
+  .mini-cagr-btn.flat{color:var(--text); border-color:var(--border);}
+  .mini-cagr.na{color:var(--muted-2); font-weight:400;}
+  .mini-cagr-popover{
+    position:absolute; top:28px; left:0; z-index:6; min-width:230px; background:var(--surface);
+    border:1px solid var(--border); border-radius:8px; padding:12px 14px; box-shadow:var(--shadow-card);
+    font-size:11.5px; color:var(--muted); line-height:1.7;
+  }
+  .mini-cagr-popover b{color:var(--text);}
   .trend-legend-item{display:flex; align-items:center; gap:6px;}
   .trend-chart-svg{width:100%; height:auto; display:block;}
   .trend-empty{color:var(--muted-2); font-size:13px; padding:20px 0; text-align:center;}
@@ -260,6 +294,7 @@
     header h1{font-size:26px;}
     header .sub{font-size:13.5px;}
     .import-panel{width:100%; min-width:0;}
+    .sub-tabs-divider{display:none;}
     .sub-tabs{width:100%;}
     .sub-tab, .trend-sub-tab{flex:1; text-align:center; padding:8px 10px; font-size:12.5px;}
     .kpi-row{grid-template-columns:repeat(2,1fr); gap:10px;}
@@ -294,35 +329,44 @@
     <div>
       <div class="eyebrow">農業部・臺灣配合飼料產量調查</div>
       <h1>台灣畜產飼料產量分析儀表板</h1>
-      <div class="designer-credit">系統設計：赫睿師管顧公司　維妮</div>
+      <div class="designer-credit">系統設計：Copyright © 2026 赫睿師管顧 維妮</div>
     </div>
   </header>
 
-  <div class="main-tabs" id="mainTabs">
-    <div class="main-tab active" data-tab="trend">趨勢分析</div>
-    <div class="main-tab" data-tab="single">年度分析</div>
+  <div class="main-tabs-row">
+    <div class="main-tab-line is-active" id="mainTabs">
+      <div class="main-tab active" data-tab="trend">趨勢分析</div>
+      <div class="sub-tabs-divider"></div>
+      <div class="sub-tabs" id="trendSubTabs">
+        <div class="trend-sub-tab active" data-trendsubtab="industry">產業趨勢</div>
+        <div class="trend-sub-tab" data-trendsubtab="company">企業趨勢</div>
+      </div>
+    </div>
+    <div class="main-tab-line">
+      <div class="main-tab" data-tab="single">年度分析</div>
+      <div class="sub-tabs-divider"></div>
+      <div class="sub-tabs" id="subTabs">
+        <div class="sub-tab active" data-subtab="overview">產業總覽</div>
+        <div class="sub-tab" data-subtab="lookup">產量明細查詢</div>
+      </div>
+    </div>
   </div>
 
   <div id="tab-trend">
-
-  <div class="sub-tabs" id="trendSubTabs">
-    <div class="trend-sub-tab active" data-trendsubtab="industry">產業趨勢</div>
-    <div class="trend-sub-tab" data-trendsubtab="company">企業趨勢</div>
-  </div>
 
   <div id="trendsubtab-industry">
 
   <div class="gauge-rule"><span>產業趨勢分析</span></div>
   <section>
     <div class="section-head"><h2><span class="num">①</span>總產量趨勢</h2></div>
-    <div class="section-desc" id="trendTotalDesc">折線標示每年全臺總產量，最多可累積並保留近 10 年資料（ 名次代表國興畜產 ）</div>
+    <div class="section-desc" id="trendTotalDesc">折線標示每年全臺總產量與成長率%，最多累積並保留 10 年資料（ 最下方名次代表國興市占率 ）</div>
     <div class="panel trend-panel-black"><div id="trendTotalChart"></div></div>
   </section>
 
   <div class="gauge-rule"><span>廠商比較</span></div>
   <section>
     <div class="section-head"><h2><span class="num">②</span>近年廠商產量比較</h2></div>
-    <div class="section-desc">比較廠商產量變化，請自行更換比較對象</div>
+    <div class="section-desc">比較廠商產量變化，請自行更換比較對象，一次最多可比較三間</div>
     <div class="panel trend-panel-black">
       <div class="trend-selectors" id="trendSelectors"></div>
       <div id="trendCompareChart"></div>
@@ -332,12 +376,16 @@
   <div class="gauge-rule"><span>飼料比較</span></div>
   <section>
     <div class="section-head"><h2><span class="num">③</span>近年畜產飼料產量比較</h2></div>
-    <div class="section-desc">比較飼料類別產量變化，請自行更換比較種類</div>
+    <div class="section-desc">比較飼料類別產量變化，請自行更換比較種類，一次最多可比較五種</div>
     <div class="panel trend-panel-black">
       <div class="trend-selectors" id="trendFeedSelectors"></div>
       <div id="trendFeedCompareChart"></div>
     </div>
   </section>
+
+  <div class="tab-footnote">
+    <p><b>複合成長率（CAGR）：</b>公式為 CAGR = (期末價值 ÷ 期初價值)^(1/N) − 1。期末價值為最後一年的總產量，期初價值為第一年的總產量，N 為期間的年數。</p>
+  </div>
 
   </div>
 
@@ -400,11 +448,6 @@
   <div id="tab-single" style="display:none;">
 
   <div class="year-tabs" id="yearTabs"></div>
-
-  <div class="sub-tabs" id="subTabs">
-    <div class="sub-tab active" data-subtab="overview">產業分析總覽</div>
-    <div class="sub-tab" data-subtab="lookup">產量明細查詢</div>
-  </div>
 
   <div id="subtab-overview">
 
@@ -995,6 +1038,11 @@ function buildLineChartSVG(series, years, opts){
     unitSvg = `<text x="${width-padR}" y="${padT-22}" text-anchor="end" font-size="11.5" fill="${COL_MUTED}" font-family="IBM Plex Sans TC, sans-serif" font-weight="700">${opts.unitLabel}</text>`;
   }
 
+  let topLeftSvg = '';
+  if(opts.topLeftLabel){
+    topLeftSvg = `<text x="${padL}" y="${padT-22}" text-anchor="start" font-size="13" fill="${opts.topLeftColor || '#D8A930'}" font-family="IBM Plex Mono, monospace" font-weight="700">${opts.topLeftLabel}</text>`;
+  }
+
   return `<svg class="trend-chart-svg" viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">
     ${bgSvg}
     ${gridSvg}
@@ -1003,6 +1051,7 @@ function buildLineChartSVG(series, years, opts){
     ${rankRowSvg}
     ${xLabelsSvg}
     ${unitSvg}
+    ${topLeftSvg}
   </svg>`;
 }
 
@@ -1037,15 +1086,101 @@ function renderTrendTotalChart(yearly){
     return { label: `第${gh.rank}名`, color };
   });
   const yTicks = [4500000,5500000,6500000].map(v=>({value:v, label:(v/10000)+'萬'}));
-  wrap.innerHTML = buildLineChartSVG([{name:'總產量', color:'#D8A930', points}], years, {
-    height:320, yTicks, unitLabel:'單位：公噸', blackBg:true, labelFontSize: 8.47, sublabelBelow:true,
-    rankRow: { value: 4500000, offsetY: 10, items: rankItems, fontSize: 12 }
+
+  let cagrLabel = null, cagrCalcHtml = '';
+  const n = yearly.length - 1;
+  if(n > 0 && yearly[0].grandTotal > 0){
+    const startVal = yearly[0].grandTotal, endVal = yearly[yearly.length-1].grandTotal;
+    const cagr = Math.pow(endVal / startVal, 1/n) - 1;
+    const pct = cagr*100;
+    cagrLabel = `複合成長率 CAGR ${(pct >= 0 ? '+' : '')}${pct.toFixed(1)}%`;
+    cagrCalcHtml = `<p><b>計算過程：</b>(${fmt(endVal)} ÷ ${fmt(startVal)})<sup>1/${n}</sup> − 1 = ${(pct >= 0 ? '+' : '')}${pct.toFixed(1)}%</p>
+      <p><b>期間：</b>${yearly[0].year}年（期初 ${fmt(startVal)} 公噸）→ ${yearly[yearly.length-1].year}年（期末 ${fmt(endVal)} 公噸），共 ${n} 年</p>`;
+  }
+
+  const svg = buildLineChartSVG([{name:'總產量', color:'#D8A930', points}], years, {
+    height:320, yTicks, unitLabel:null, blackBg:true, labelFontSize: 8.47, sublabelBelow:true,
+    rankRow: { value: 4500000, offsetY: 10, items: rankItems, fontSize: 9.6 }
   });
-  descEl.textContent = '折線標示每年全臺總產量，最多可累積並保留近 10 年資料（ 名次代表國興畜產 ）';
+  const legendHtml = `<div class="trend-legend trend-legend-topright">
+    <div class="trend-legend-item"><span class="trend-swatch" style="background:#D8A930"></span>全臺總產量公噸 / 成長率%</div>
+    <div class="trend-legend-item"><span class="trend-swatch" style="background:#F6F2EA"></span>國興市場占有率的名次</div>
+  </div>`;
+  const cagrHtml = cagrLabel ? `
+    <button type="button" class="cagr-btn" id="cagrToggleBtn">${cagrLabel}</button>
+    <div class="cagr-popover" id="cagrPopover" style="display:none;">
+      <p><b>公式：</b>CAGR = (期末價值 ÷ 期初價值)<sup>1/N</sup> − 1</p>
+      <p><b>期末價值：</b>最後一年的總產量</p>
+      <p><b>期初價值：</b>第一年的總產量</p>
+      <p><b>N：</b>期間的年數</p>
+      ${cagrCalcHtml}
+    </div>` : '';
+  wrap.innerHTML = `<div class="trend-chart-overlay">${svg}${legendHtml}${cagrHtml}</div>`;
+
+  const cagrBtn = document.getElementById('cagrToggleBtn');
+  if(cagrBtn){
+    cagrBtn.addEventListener('click', ()=>{
+      const pop = document.getElementById('cagrPopover');
+      pop.style.display = pop.style.display === 'none' ? 'block' : 'none';
+    });
+  }
+  descEl.textContent = '折線標示每年全臺總產量與成長率%，最多累積並保留 10 年資料（ 最下方名次代表國興市占率 ）';
 }
 
-const TREND_COLORS = ['#D8A930', '#D97757', '#54A08C'];
+const TREND_COLORS = ['#D8A930', '#D97757', '#54A08C', '#4C7A8C', '#B07AD9'];
 let trendSelectedCompanies = [null, null, null];
+
+let miniCagrIdCounter = 0;
+function computeCAGRDetail(points){
+  if(!points || points.length < 2) return null;
+  const start = points[0], end = points[points.length-1];
+  const n = points.length - 1;
+  if(n <= 0 || !(start.value > 0)) return null;
+  const cagr = Math.pow(end.value/start.value, 1/n) - 1;
+  return {cagr, start, end, n};
+}
+
+function calcSeriesCAGRDetail(yearly, name, listKey){
+  if(!name) return null;
+  const points = yearly.map(y=>{
+    const d = y[listKey].find(c=>c.name===name);
+    return d && d.total > 0 ? {year:y.year, value:d.total} : null;
+  }).filter(Boolean);
+  return computeCAGRDetail(points);
+}
+
+function miniCagrHtml(detail){
+  if(!detail){
+    return `<div class="mini-cagr-slot"><span class="mini-cagr na">CAGR －</span></div>`;
+  }
+  const pct = detail.cagr*100;
+  const cls = pct > 0 ? 'up' : (pct < 0 ? 'down' : 'flat');
+  const sign = pct >= 0 ? '+' : '';
+  const id = 'miniCagrPop' + (miniCagrIdCounter++);
+  return `<div class="mini-cagr-slot">
+    <button type="button" class="mini-cagr-btn ${cls}" data-cagr-target="${id}">CAGR ${sign}${pct.toFixed(1)}% ▾</button>
+    <div class="mini-cagr-popover" id="${id}" style="display:none;">
+      <p><b>計算過程：</b>(${fmt(detail.end.value)} ÷ ${fmt(detail.start.value)})<sup>1/${detail.n}</sup> − 1 = ${sign}${pct.toFixed(1)}%</p>
+      <p><b>期間：</b>${detail.start.year}年（${fmt(detail.start.value)} 公噸）→ ${detail.end.year}年（${fmt(detail.end.value)} 公噸），共 ${detail.n} 年</p>
+    </div>
+  </div>`;
+}
+
+document.addEventListener('click', (e)=>{
+  const btn = e.target.closest('.mini-cagr-btn');
+  if(btn){
+    const pop = document.getElementById(btn.dataset.cagrTarget);
+    if(pop){
+      const willShow = pop.style.display === 'none';
+      document.querySelectorAll('.mini-cagr-popover').forEach(p=>{ p.style.display = 'none'; });
+      pop.style.display = willShow ? 'block' : 'none';
+    }
+    return;
+  }
+  if(!e.target.closest('.mini-cagr-popover')){
+    document.querySelectorAll('.mini-cagr-popover').forEach(p=>{ p.style.display = 'none'; });
+  }
+});
 
 function renderTrendSelectors(yearly){
   const wrap = document.getElementById('trendSelectors');
@@ -1079,16 +1214,23 @@ function renderTrendSelectors(yearly){
     select.appendChild(noneOpt);
     allNames.forEach(name=>{
       const opt = document.createElement('option');
-      opt.value = name; opt.textContent = name;
+      opt.value = name; opt.textContent = name + (name.includes('國興畜產') ? ' ★' : '');
       if(name === sel) opt.selected = true;
       select.appendChild(opt);
     });
+    const colWrap = document.createElement('div');
+    const cagrContainer = document.createElement('div');
+    cagrContainer.innerHTML = miniCagrHtml(calcSeriesCAGRDetail(yearly, sel, 'companyList'));
     select.addEventListener('change', ()=>{
       trendSelectedCompanies[idx] = select.value || null;
-      renderTrendCompareChart(computeYearlyStats());
+      const freshYearly = computeYearlyStats();
+      renderTrendCompareChart(freshYearly);
+      cagrContainer.innerHTML = miniCagrHtml(calcSeriesCAGRDetail(freshYearly, trendSelectedCompanies[idx], 'companyList'));
     });
+    colWrap.appendChild(select);
+    colWrap.appendChild(cagrContainer);
     group.appendChild(swatch);
-    group.appendChild(select);
+    group.appendChild(colWrap);
     wrap.appendChild(group);
   });
 }
@@ -1117,7 +1259,7 @@ function renderTrendCompareChart(yearly){
   }) + buildTrendLegend(series);
 }
 
-let trendSelectedFeeds = [null, null, null];
+let trendSelectedFeeds = [null, null, null, null, null];
 
 function renderTrendFeedSelectors(yearly){
   const wrap = document.getElementById('trendFeedSelectors');
@@ -1134,8 +1276,8 @@ function renderTrendFeedSelectors(yearly){
   });
 
   if(trendSelectedFeeds.every(v=>v===null)){
-    const defaults = latest.feedList.filter(d=>d.rank>=1 && d.rank<=3).map(d=>d.name);
-    trendSelectedFeeds = [defaults[0]||allNames[0]||null, defaults[1]||allNames[1]||null, defaults[2]||allNames[2]||null];
+    const defaults = latest.feedList.filter(d=>d.rank>=1 && d.rank<=5).map(d=>d.name);
+    trendSelectedFeeds = [defaults[0]||allNames[0]||null, defaults[1]||allNames[1]||null, defaults[2]||allNames[2]||null, defaults[3]||allNames[3]||null, defaults[4]||allNames[4]||null];
   }
 
   trendSelectedFeeds.forEach((sel, idx)=>{
@@ -1157,10 +1299,17 @@ function renderTrendFeedSelectors(yearly){
     });
     select.addEventListener('change', ()=>{
       trendSelectedFeeds[idx] = select.value || null;
-      renderTrendFeedCompareChart(computeYearlyStats());
+      const freshYearly = computeYearlyStats();
+      renderTrendFeedCompareChart(freshYearly);
+      cagrContainer.innerHTML = miniCagrHtml(calcSeriesCAGRDetail(freshYearly, trendSelectedFeeds[idx], 'feedList'));
     });
+    const colWrap = document.createElement('div');
+    const cagrContainer = document.createElement('div');
+    cagrContainer.innerHTML = miniCagrHtml(calcSeriesCAGRDetail(yearly, sel, 'feedList'));
+    colWrap.appendChild(select);
+    colWrap.appendChild(cagrContainer);
     group.appendChild(swatch);
-    group.appendChild(select);
+    group.appendChild(colWrap);
     wrap.appendChild(group);
   });
 }
@@ -1227,9 +1376,43 @@ function renderCoTotalChart(){
     }
     return { value: t, label: fmt(t), sublabel, sublabelColor };
   });
-  wrap.innerHTML = buildLineChartSVG([{name: sharedSelectedCompany || '', color:'#D8A930', points}], years, {
+
+  let cagrLabel = null, cagrCalcHtml = '';
+  const validIdx = totals.map((t,i)=>({t,i})).filter(d=>d.t>0);
+  if(validIdx.length >= 2){
+    const startD = validIdx[0], endD = validIdx[validIdx.length-1];
+    const n = endD.i - startD.i;
+    if(n > 0){
+      const cagr = Math.pow(endD.t/startD.t, 1/n) - 1;
+      const pct = cagr*100;
+      const sign = pct >= 0 ? '+' : '';
+      cagrLabel = `複合成長率 CAGR ${sign}${pct.toFixed(1)}%`;
+      cagrCalcHtml = `<p><b>計算過程：</b>(${fmt(endD.t)} ÷ ${fmt(startD.t)})<sup>1/${n}</sup> − 1 = ${sign}${pct.toFixed(1)}%</p>
+        <p><b>期間：</b>${years[startD.i]}年（期初 ${fmt(startD.t)} 公噸）→ ${years[endD.i]}年（期末 ${fmt(endD.t)} 公噸），共 ${n} 年</p>`;
+    }
+  }
+
+  const svg = buildLineChartSVG([{name: sharedSelectedCompany || '', color:'#D8A930', points}], years, {
     height:320, unitLabel:'單位：公噸', blackBg:true, labelFontSize: 8.47, sublabelBelow:true
   });
+  const cagrHtml = cagrLabel ? `
+    <button type="button" class="cagr-btn" id="coCagrToggleBtn">${cagrLabel}</button>
+    <div class="cagr-popover" id="coCagrPopover" style="display:none;">
+      <p><b>公式：</b>CAGR = (期末價值 ÷ 期初價值)<sup>1/N</sup> − 1</p>
+      <p><b>期末價值：</b>最後一年的總產量</p>
+      <p><b>期初價值：</b>第一年的總產量</p>
+      <p><b>N：</b>期間的年數</p>
+      ${cagrCalcHtml}
+    </div>` : '';
+  wrap.innerHTML = `<div class="trend-chart-overlay">${svg}${cagrHtml}</div>`;
+
+  const cagrBtn = document.getElementById('coCagrToggleBtn');
+  if(cagrBtn){
+    cagrBtn.addEventListener('click', ()=>{
+      const pop = document.getElementById('coCagrPopover');
+      pop.style.display = pop.style.display === 'none' ? 'block' : 'none';
+    });
+  }
 }
 
 function buildPieChartSVG(data, size){
@@ -1372,6 +1555,12 @@ function renderTrendCoSection(){
 function renderTrendCoFeedSelectors(){
   const wrap = document.getElementById('trendCoFeedSelectors');
   wrap.innerHTML = '';
+  const years = [...new Set(records.map(r=>r.year))].sort((a,b)=>a-b);
+  const coFeedPoints = (name) => years.map(y=>{
+    const v = getCompanyFeedTotals(sharedSelectedCompany, y)[name];
+    return v > 0 ? {year:y, value:v} : null;
+  }).filter(Boolean);
+
   trendCoSelectedFeeds.forEach((sel, idx)=>{
     const group = document.createElement('div');
     group.className = 'trend-select-group';
@@ -1389,12 +1578,18 @@ function renderTrendCoFeedSelectors(){
       if(name === sel) opt.selected = true;
       select.appendChild(opt);
     });
+    const colWrap = document.createElement('div');
+    const cagrContainer = document.createElement('div');
+    cagrContainer.innerHTML = miniCagrHtml(computeCAGRDetail(sel ? coFeedPoints(sel) : null));
     select.addEventListener('change', ()=>{
       trendCoSelectedFeeds[idx] = select.value || null;
       renderTrendCoChart();
+      cagrContainer.innerHTML = miniCagrHtml(computeCAGRDetail(trendCoSelectedFeeds[idx] ? coFeedPoints(trendCoSelectedFeeds[idx]) : null));
     });
+    colWrap.appendChild(select);
+    colWrap.appendChild(cagrContainer);
     group.appendChild(swatch);
-    group.appendChild(select);
+    group.appendChild(colWrap);
     wrap.appendChild(group);
   });
 }
@@ -1676,18 +1871,25 @@ document.querySelectorAll('th[data-county-key]').forEach(th=>{
 });
 document.getElementById('countySearchBox').addEventListener('input', applyCountyTableView);
 
+function activateMainTab(target){
+  document.querySelectorAll('.main-tab').forEach(t=>t.classList.toggle('active', t.dataset.tab === target));
+  document.querySelectorAll('.main-tab-line').forEach(line=>{
+    const tab = line.querySelector('.main-tab');
+    line.classList.toggle('is-active', tab && tab.dataset.tab === target);
+  });
+  document.getElementById('tab-trend').style.display = target === 'trend' ? '' : 'none';
+  document.getElementById('tab-single').style.display = target === 'single' ? '' : 'none';
+}
+
 document.querySelectorAll('.main-tab').forEach(tab=>{
   tab.addEventListener('click', ()=>{
-    document.querySelectorAll('.main-tab').forEach(t=>t.classList.remove('active'));
-    tab.classList.add('active');
-    const target = tab.dataset.tab;
-    document.getElementById('tab-trend').style.display = target === 'trend' ? '' : 'none';
-    document.getElementById('tab-single').style.display = target === 'single' ? '' : 'none';
+    activateMainTab(tab.dataset.tab);
   });
 });
 
 document.querySelectorAll('.trend-sub-tab').forEach(tab=>{
   tab.addEventListener('click', ()=>{
+    activateMainTab('trend');
     document.querySelectorAll('.trend-sub-tab').forEach(t=>t.classList.remove('active'));
     tab.classList.add('active');
     const target = tab.dataset.trendsubtab;
@@ -1698,6 +1900,7 @@ document.querySelectorAll('.trend-sub-tab').forEach(tab=>{
 
 document.querySelectorAll('.sub-tab').forEach(tab=>{
   tab.addEventListener('click', ()=>{
+    activateMainTab('single');
     document.querySelectorAll('.sub-tab').forEach(t=>t.classList.remove('active'));
     tab.classList.add('active');
     const target = tab.dataset.subtab;
@@ -1753,61 +1956,6 @@ function detectYearFromFilename(name){
   const m = name.match(/(\d{2,3})\s*\.xlsx?$/i);
   return m ? parseInt(m[1], 10) : null;
 }
-
-// ================= AUTO-LOAD SEED FILES (same directory as this page) =================
-const SEED_FILES = [
-  {year:108, file:'feed_production_108.xlsx'},
-  {year:109, file:'feed_production_109.xlsx'},
-  {year:110, file:'feed_production_110.xlsx'},
-  {year:111, file:'feed_production_111.xlsx'},
-  {year:112, file:'feed_production_112.xlsx'},
-  {year:113, file:'feed_production_113.xlsx'},
-  {year:114, file:'feed_production_114.xlsx'},
-];
-
-async function loadSeedFiles(){
-  if(typeof XLSX === 'undefined'){ console.warn('[畜產儀表板] XLSX 套件未載入，無法自動匯入'); return; }
-  const statusEl = document.getElementById('importStatus');
-  const loadedYears = [], failedFiles = [];
-  for(const {year, file} of SEED_FILES){
-    try{
-      const res = await fetch(file, {cache:'no-store'});
-      if(!res.ok){
-        console.warn(`[畜產儀表板] ${file} 讀取失敗，HTTP 狀態碼 ${res.status}`);
-        failedFiles.push(file);
-        continue;
-      }
-      const buf = await res.arrayBuffer();
-      const wb = XLSX.read(buf, {type:'array'});
-      let fileRecords = [];
-      for(const sn of wb.SheetNames){
-        fileRecords = fileRecords.concat(parseSheetToRecords(wb.Sheets[sn]));
-      }
-      if(fileRecords.length === 0){
-        console.warn(`[畜產儀表板] ${file} 已讀取，但找不到符合格式的資料列（檢查是否有「公司名稱」欄位標題）`);
-        failedFiles.push(file);
-        continue;
-      }
-      fileRecords.forEach(r => r.year = year);
-      records = records.filter(r => r.year !== year).concat(fileRecords);
-      loadedYears.push(year);
-      console.log(`[畜產儀表板] ${file} 已成功匯入 ${fileRecords.length} 筆資料（${year}年）`);
-    }catch(e){
-      console.error(`[畜產儀表板] ${file} 讀取發生錯誤：`, e);
-      failedFiles.push(file); // network error, missing file, CORS, or not served over http(s)
-    }
-  }
-  if(loadedYears.length){
-    computeAndRender();
-  }
-  if(statusEl && (loadedYears.length || failedFiles.length)){
-    statusEl.className = failedFiles.length ? 'import-status err' : 'import-status ok';
-    let msg = loadedYears.length ? `已自動載入 ${loadedYears.join('、')} 年度資料。` : '';
-    if(failedFiles.length) msg += `找不到或無法讀取：${failedFiles.join('、')}（詳見瀏覽器 Console）`;
-    statusEl.textContent = msg;
-  }
-}
-loadSeedFiles();
 
 document.getElementById('fileInput').addEventListener('change', async (e)=>{
   const files = [...e.target.files];
