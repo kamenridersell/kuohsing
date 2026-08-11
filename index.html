@@ -590,20 +590,7 @@
   </div>
 
   <footer>
-    <div class="import-panel">
-      <div class="import-row">
-        <div class="import-year-row">
-          <label for="importYear" title="檔名沒有年度時使用">年度（備用）</label>
-          <input type="number" id="importYear" min="100" value="113">
-        </div>
-        <label class="btn" for="fileInput">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2"/></svg>
-          匯入 Excel（可一次選多個檔案）
-        </label>
-      </div>
-      <input type="file" id="fileInput" accept=".xlsx,.xls" multiple>
-      <div class="import-status" id="importStatus"></div>
-    </div>
+    <div class="import-status" id="importStatus"></div>
   </footer>
 
 </div>
@@ -1952,72 +1939,60 @@ function parseSheetToRecords(sheet){
   return out;
 }
 
-function detectYearFromFilename(name){
-  const m = name.match(/(\d{2,3})\s*\.xlsx?$/i);
-  return m ? parseInt(m[1], 10) : null;
-}
+// ================= AUTO-LOAD SEED FILES (same directory as this page) =================
+const SEED_FILES = [
+  {year:108, file:'feed_production_108.xlsx'},
+  {year:109, file:'feed_production_109.xlsx'},
+  {year:110, file:'feed_production_110.xlsx'},
+  {year:111, file:'feed_production_111.xlsx'},
+  {year:112, file:'feed_production_112.xlsx'},
+  {year:113, file:'feed_production_113.xlsx'},
+  {year:114, file:'feed_production_114.xlsx'},
+];
 
-document.getElementById('fileInput').addEventListener('change', async (e)=>{
-  const files = [...e.target.files];
-  if(!files.length) return;
+async function loadSeedFiles(){
+  if(typeof XLSX === 'undefined'){ console.warn('[畜產儀表板] XLSX 套件未載入，無法自動匯入'); return; }
   const statusEl = document.getElementById('importStatus');
-  statusEl.className = 'import-status';
-
-  const yearInput = document.getElementById('importYear');
-  const fallbackYear = parseInt(yearInput.value, 10);
-
-  if(typeof XLSX === 'undefined'){
-    statusEl.className = 'import-status err';
-    statusEl.textContent = 'Excel 解析套件尚未載入完成，請稍候片刻再試一次。';
-    e.target.value = '';
-    return;
-  }
-  statusEl.textContent = '解析中…';
-  const byYear = {};
-  let addedFiles = 0, errors = [];
-  for(const file of files){
-    const detectedYear = detectYearFromFilename(file.name);
-    const yr = detectedYear || fallbackYear;
-    if(!yr || yr < 100){
-      errors.push(file.name + '（無法判斷年度：請在檔名中包含民國年，如 feed_production_108.xlsx，或於「年度」欄位填入民國年）');
-      continue;
-    }
+  const loadedYears = [], failedFiles = [];
+  for(const {year, file} of SEED_FILES){
     try{
-      const buf = await file.arrayBuffer();
+      const res = await fetch(file, {cache:'no-store'});
+      if(!res.ok){
+        console.warn(`[畜產儀表板] ${file} 讀取失敗，HTTP 狀態碼 ${res.status}`);
+        failedFiles.push(file);
+        continue;
+      }
+      const buf = await res.arrayBuffer();
       const wb = XLSX.read(buf, {type:'array'});
       let fileRecords = [];
       for(const sn of wb.SheetNames){
-        const recs = parseSheetToRecords(wb.Sheets[sn]);
-        fileRecords = fileRecords.concat(recs);
+        fileRecords = fileRecords.concat(parseSheetToRecords(wb.Sheets[sn]));
       }
-      if(fileRecords.length === 0){ errors.push(file.name + '（找不到符合格式的資料列）'); continue; }
-      fileRecords.forEach(r => r.year = yr);
-      (byYear[yr] = byYear[yr] || []).push(...fileRecords);
-      addedFiles++;
-    }catch(err){
-      errors.push(file.name + '（' + err.message + '）');
+      if(fileRecords.length === 0){
+        console.warn(`[畜產儀表板] ${file} 已讀取，但找不到符合格式的資料列（檢查是否有「公司名稱」欄位標題）`);
+        failedFiles.push(file);
+        continue;
+      }
+      fileRecords.forEach(r => r.year = year);
+      records = records.filter(r => r.year !== year).concat(fileRecords);
+      loadedYears.push(year);
+      console.log(`[畜產儀表板] ${file} 已成功匯入 ${fileRecords.length} 筆資料（${year}年）`);
+    }catch(e){
+      console.error(`[畜產儀表板] ${file} 讀取發生錯誤：`, e);
+      failedFiles.push(file); // network error, missing file, CORS, or not served over http(s)
     }
   }
-  const yearsTouched = Object.keys(byYear).map(Number).sort((a,b)=>a-b);
-  let totalRecords = 0;
-  yearsTouched.forEach(yr=>{
-    // 重新匯入同一年度的資料時，覆蓋（取代）該年度先前的舊資料
-    records = records.filter(r => r.year !== yr).concat(byYear[yr]);
-    totalRecords += byYear[yr].length;
-  });
-  if(yearsTouched.length > 0){
+  if(loadedYears.length){
     computeAndRender();
-    await persistImportedRecords();
   }
-  if(errors.length){
-    statusEl.className = 'import-status err';
-    statusEl.textContent = `已匯入 ${addedFiles} 個檔案、共 ${totalRecords} 筆資料（涵蓋 ${yearsTouched.join('、')} 年度，已覆蓋各該年度舊資料）。失敗：${errors.join('；')}`;
-  } else if(totalRecords > 0){
-    statusEl.className = 'import-status ok';
-    statusEl.textContent = `已匯入 ${addedFiles} 個檔案、共 ${totalRecords} 筆資料（涵蓋 ${yearsTouched.join('、')} 年度，已覆蓋各該年度舊資料），圖表已更新。`;
+  if(statusEl && (loadedYears.length || failedFiles.length)){
+    statusEl.className = failedFiles.length ? 'import-status err' : 'import-status ok';
+    let msg = loadedYears.length ? `已自動載入 ${loadedYears.join('、')} 年度資料。` : '';
+    if(failedFiles.length) msg += `找不到或無法讀取：${failedFiles.join('、')}（詳見瀏覽器 Console）`;
+    statusEl.textContent = msg;
   }
-  e.target.value = '';
-});
+}
+loadSeedFiles();
 </script>
 </body>
 </html>
