@@ -149,13 +149,14 @@
   .pie-legend-pct-num{color:var(--wheat); font-weight:700;}
   .trend-select-group select:focus{outline:1px solid var(--wheat); border-color:var(--wheat);}
   .trend-legend{display:flex; flex-wrap:wrap; gap:16px; margin-top:14px; font-size:12.5px; color:var(--muted); font-weight:600;}
-  .trend-chart-overlay{position:relative;}
-  .trend-legend-topright{position:absolute; top:14px; right:20px; margin:0; flex-direction:row; align-items:center; gap:16px; flex-wrap:nowrap; white-space:nowrap;}
+  .trend-chart-overlay{position:relative; display:flex; flex-direction:column;}
+  .trend-legend-topright{position:static; order:2; margin:0 0 14px; flex-direction:row; flex-wrap:wrap; align-items:center; gap:16px;}
   .cagr-btn{
-    position:absolute; top:14px; left:20px; background:none; border:1px solid var(--wheat); color:var(--wheat);
+    position:static; order:1; align-self:flex-start; margin:0 0 10px; background:none; border:1px solid var(--wheat); color:var(--wheat);
     font-family:'IBM Plex Mono',monospace; font-size:12.5px; font-weight:700; padding:5px 12px; border-radius:20px;
     cursor:pointer; user-select:none; transition:background .15s;
   }
+  .trend-chart-overlay .trend-chart-svg{order:3;}
   .cagr-btn:hover{background:rgba(216,169,48,0.12);}
   .cagr-btn::after{content:' ▾'; font-size:10px;}
   .cagr-popover{
@@ -303,10 +304,8 @@
     .panel{padding:16px;}
     .bar-row{grid-template-columns:1fr; row-gap:6px; padding:12px 0;}
     .bar-row .rvals{text-align:left;}
-    .trend-chart-overlay{display:flex; flex-direction:column;}
-    .trend-chart-overlay .cagr-btn{position:static; order:1; margin:0 0 8px; align-self:flex-start; font-size:11px; padding:4px 10px;}
-    .trend-chart-overlay .trend-legend-topright{position:static; order:2; margin:0 0 12px; flex-direction:column; align-items:flex-start; gap:4px; font-size:11px;}
-    .trend-chart-overlay .trend-chart-svg{order:3;}
+    .cagr-btn{font-size:11px; padding:4px 10px;}
+    .trend-legend-topright{flex-direction:column; align-items:flex-start; gap:4px; font-size:11px;}
     .bar-row .rlabel .tag{margin-left:0;}
     .fc-grid{grid-template-columns:1fr;}
     .fc-card .fc-head{flex-direction:column; align-items:flex-start; gap:6px;}
